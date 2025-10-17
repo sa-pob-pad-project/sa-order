@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  sa_order_postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: sa_order
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./volume/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d sa_order"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+
+  sa_order:
+    image: sa_order:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    depends_on:
+      sa_order_postgres:
+        condition: service_healthy
+    environment:
+      - DB_HOST=sa_order_postgres
+      - DB_PORT=5432
+      - USER_SERVICE_URL=http://host.docker.internal:8000/api/user
+      - APPOINTMENT_SERVICE_URL=http://host.docker.internal:8001/api/appointment
+
+
+networks:
+  default:
+    driver: bridge

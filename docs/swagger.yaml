@@ -1,0 +1,402 @@
+basePath: /
+definitions:
+  dto.DoctorLoginRequestDto:
+    properties:
+      password:
+        minLength: 8
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  dto.DoctorLoginResponseDto:
+    properties:
+      access_token:
+        type: string
+    type: object
+  dto.GetDoctorsByIDsRequestDto:
+    properties:
+      doctor_ids:
+        items:
+          type: string
+        type: array
+    required:
+    - doctor_ids
+    type: object
+  dto.GetPatientsByIDsRequestDto:
+    properties:
+      patient_ids:
+        items:
+          type: string
+        type: array
+    required:
+    - patient_ids
+    type: object
+  dto.GetProfileResponseDto:
+    properties:
+      address:
+        type: string
+      allergies:
+        type: string
+      birth_date:
+        type: string
+      blood_type:
+        type: string
+      emergency_contact:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      hospital_id:
+        type: string
+      id:
+        type: string
+      id_card_number:
+        type: string
+      last_name:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  dto.PatientLoginRequestDto:
+    properties:
+      hospital_id:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.PatientLoginResponseDto:
+    properties:
+      access_token:
+        type: string
+    type: object
+  dto.PatientRegisterPatientRequestDto:
+    properties:
+      address:
+        type: string
+      allergies:
+        type: string
+      birth_date:
+        type: string
+      blood_type:
+        type: string
+      emergency_contact:
+        type: string
+      first_name:
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        - other
+        type: string
+      hospital_id:
+        description: Patient specific fields
+        type: string
+      id_card_number:
+        type: string
+      last_name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      phone_number:
+        type: string
+    required:
+    - first_name
+    - gender
+    - hospital_id
+    - last_name
+    - password
+    type: object
+  dto.PatientRegisterResponseDto:
+    properties:
+      message:
+        type: string
+    type: object
+  dto.UpdatePatientProfileRequestDto:
+    properties:
+      address:
+        type: string
+      allergies:
+        type: string
+      birth_date:
+        description: Patient specific fields
+        type: string
+      blood_type:
+        type: string
+      emergency_contact:
+        type: string
+      first_name:
+        type: string
+      id_card_number:
+        type: string
+      last_name:
+        type: string
+      phone_number:
+        type: string
+    type: object
+  dto.UpdatePatientProfileResponseDto:
+    properties:
+      message:
+        type: string
+    type: object
+  response.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  user-service_pkg_dto.GetDoctorProfileResponseDto:
+    properties:
+      bio:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      phone_number:
+        type: string
+      specialty:
+        type: string
+      username:
+        type: string
+      years_experience:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample server for a user API.
+  title: User API
+  version: "1.0"
+paths:
+  /api/user/v1/doctor/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a doctor and return access token with cookie
+      parameters:
+      - description: Doctor login credentials
+        in: body
+        name: doctor
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DoctorLoginRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Doctor logged in successfully
+          schema:
+            $ref: '#/definitions/dto.DoctorLoginResponseDto'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Login a doctor
+      tags:
+      - doctors
+  /api/user/v1/doctors:
+    post:
+      consumes:
+      - application/json
+      description: Get multiple doctor profiles by their IDs
+      parameters:
+      - description: Doctor IDs
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GetDoctorsByIDsRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Doctor profiles retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/user-service_pkg_dto.GetDoctorProfileResponseDto'
+            type: array
+        "404":
+          description: Doctors not found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to get doctor profiles
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Get doctors by IDs
+      tags:
+      - doctors
+  /api/user/v1/patient/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate a patient and return access token
+      parameters:
+      - description: Patient login credentials
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PatientLoginRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Patient logged in successfully
+          schema:
+            $ref: '#/definitions/dto.PatientLoginResponseDto'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Login a patient
+      tags:
+      - patients
+  /api/user/v1/patient/me:
+    get:
+      consumes:
+      - application/json
+      description: Get the profile information of the authenticated patient
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile retrieved successfully
+          schema:
+            $ref: '#/definitions/dto.GetProfileResponseDto'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to get user profile
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get patient profile
+      tags:
+      - patients
+    put:
+      consumes:
+      - application/json
+      description: Update the profile information of the authenticated patient
+      parameters:
+      - description: Patient profile update data
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePatientProfileRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Profile updated successfully
+          schema:
+            $ref: '#/definitions/dto.UpdatePatientProfileResponseDto'
+        "400":
+          description: Invalid request body or user not found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to update user profile
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update patient profile
+      tags:
+      - patients
+  /api/user/v1/patient/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new patient in the system
+      parameters:
+      - description: Patient registration data
+        in: body
+        name: patient
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PatientRegisterPatientRequestDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Patient registered successfully
+          schema:
+            $ref: '#/definitions/dto.PatientRegisterResponseDto'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to register user
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Register a new patient
+      tags:
+      - patients
+  /api/user/v1/patients:
+    post:
+      consumes:
+      - application/json
+      description: Get multiple patient profiles by their IDs
+      parameters:
+      - description: Patient IDs
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GetPatientsByIDsRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Patient profiles retrieved successfully
+          schema:
+            items:
+              $ref: '#/definitions/dto.GetProfileResponseDto'
+            type: array
+        "404":
+          description: Patients not found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to get patient profiles
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Get patients by IDs
+      tags:
+      - patients
+schemes:
+- http
+securityDefinitions:
+  ApiKeyAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
