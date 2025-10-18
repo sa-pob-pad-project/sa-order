@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/swagger"
 )
 
-func SetupRoutes(app *fiber.App, orderHandler *handlers.OrderHandler, deliveryInfoHandler *handlers.DeliveryInfoHandler, jwtSvc *jwt.JwtService) {
+func SetupRoutes(app *fiber.App, orderHandler *handlers.OrderHandler, medicineHandler *handlers.MedicineHandler, deliveryInfoHandler *handlers.DeliveryInfoHandler, jwtSvc *jwt.JwtService) {
 
 	api := app.Group("/api")
 	api.Get("/swagger/*", swagger.HandlerDefault)
@@ -29,6 +29,12 @@ func SetupRoutes(app *fiber.App, orderHandler *handlers.OrderHandler, deliveryIn
 	// orderV1.Get("/orders/latest/:patient_id", )
 	orderV1.Get("/orders/:id", orderHandler.GetOrder)
 	orderV1.Get("/orders", orderHandler.GetAllOrdersHistory)
+
+	// Medicine Routes
+	medicine := api.Group("/medicine")
+	medicineV1 := medicine.Group("/v1")
+	medicineV1.Get("/medicines", medicineHandler.GetAllMedicines)
+	medicineV1.Get("/medicines/:id", medicineHandler.GetMedicineByID)
 
 	// Delivery Routes
 	delivery := api.Group("/delivery")

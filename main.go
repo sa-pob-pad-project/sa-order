@@ -106,6 +106,7 @@ func main() {
 		userClient,
 		appointmentClient,
 	)
+	medicineService := service.NewMedicineService(medicineRepository)
 	deliveryService := service.NewDeliveryService(
 		gormDB,
 		deliveryRepository,
@@ -116,6 +117,7 @@ func main() {
 
 	// Initialize Handlers
 	orderHandler := handlers.NewOrderHandler(orderService, deliveryService)
+	medicineHandler := handlers.NewMedicineHandler(medicineService)
 	deliveryInfoHandler := handlers.NewDeliveryInfoHandler(deliveryService)
 	validate := validator.New()
 
@@ -150,7 +152,7 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	routes.SetupRoutes(app, orderHandler, deliveryInfoHandler, jwtService)
+	routes.SetupRoutes(app, orderHandler, medicineHandler, deliveryInfoHandler, jwtService)
 
 	port := config.Get("APP_PORT", "8000")
 	fmt.Println("Server is running on port " + port)
