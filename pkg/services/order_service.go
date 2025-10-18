@@ -471,3 +471,41 @@ func (s *OrderService) CancelOrder(ctx context.Context, body dto.CancelOrderRequ
 		Status:  string(order.Status),
 	}, nil
 }
+
+func (s *OrderService) ApproveOrder(ctx context.Context, body dto.ApproveOrderRequestDto) (*dto.ApproveOrderResponseDto, error) {
+	userID := contextUtils.GetUserId(ctx)
+	role := contextUtils.GetRole(ctx)
+
+	if role != "doctor" {
+		return nil, apperr.New(apperr.CodeForbidden, "only doctors can approve orders", nil)
+	}
+
+	parsedOrderID, err := uuid.Parse(body.OrderID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid order ID", err)
+	}
+
+	order, err := s.orderRepository.FindByID(ctx, parsedOrderID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeNotFound, "order not found", err)
+	}
+
+	doctorID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid user ID", err)
+	}
+
+	if order.DoctorID == nil || *order.DoctorID != doctorID {
+		return nil, apperr.New(apperr.CodeForbidden, "doctor can only approve their own orders", nil)
+	}
+
+	order.Status = models.OrderStatusApproved
+	if err := s.orderRepository.Update(ctx, order); err != nil {
+		return nil, apperr.New(apperr.CodeInternal, "failed to approve order", err)
+	}
+
+	return &dto.ApproveOrderResponseDto{
+		OrderID: order.ID.String(),
+		Status:  string(order.Status),
+	}, nil
+}

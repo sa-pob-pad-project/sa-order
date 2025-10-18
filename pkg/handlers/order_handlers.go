@@ -216,3 +216,36 @@ func (h *OrderHandler) CancelOrder(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(res)
 }
+
+// ApproveOrder godoc
+// @Summary Approve an order
+// @Description Approve an existing order (doctor only - can only approve their own orders). Sets order status to approved.
+// @Tags orders
+// @Accept  json
+// @Produce  json
+// @Param order body dto.ApproveOrderRequestDto true "Order ID to approve"
+// @Success 200 {object} dto.ApproveOrderResponseDto "Order approved successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid request body or order ID"
+// @Failure 403 {object} response.ErrorResponse "Forbidden - only doctors can approve their own orders"
+// @Failure 404 {object} response.ErrorResponse "Order not found"
+// @Failure 500 {object} response.ErrorResponse "Failed to approve order"
+// @Router /api/order/v1/orders/confirm [delete]
+// @Security Bearer
+func (h *OrderHandler) ApproveOrder(c *fiber.Ctx) error {
+	var body dto.ApproveOrderRequestDto
+	if err := c.BodyParser(&body); err != nil {
+		return response.BadRequest(c, "Invalid request body "+err.Error())
+	}
+
+	if body.OrderID == "" {
+		return response.BadRequest(c, "Order ID is required")
+	}
+
+	ctx := contextUtils.GetContext(c)
+	res, err := h.orderService.ApproveOrder(ctx, body)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}

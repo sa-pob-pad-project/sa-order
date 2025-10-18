@@ -24,7 +24,7 @@ func SetupRoutes(app *fiber.App, orderHandler *handlers.OrderHandler, medicineHa
 	orderV1.Post("/orders", orderHandler.CreateOrder)
 	orderV1.Put("/orders", orderHandler.UpdateOrder)
 	orderV1.Delete("/orders", orderHandler.CancelOrder)
-	// orderV1.Post("/orders/confirm", )
+	orderV1.Post("/orders/confirm", orderHandler.ApproveOrder)
 	orderV1.Get("/orders/latest", orderHandler.GetLatestOrder)
 	orderV1.Get("/orders/latest/:patient_id", orderHandler.GetLatestOrderByPatientID)
 	orderV1.Get("/orders/:id", orderHandler.GetOrder)
