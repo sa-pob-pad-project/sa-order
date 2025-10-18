@@ -74,26 +74,6 @@ func (h *DeliveryInfoHandler) GetDeliveryInfo(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(res)
 }
 
-// GetAllDeliveryInfos godoc
-// @Summary Get all delivery information
-// @Description Retrieve all delivery information records
-// @Tags delivery-info
-// @Accept json
-// @Produce json
-// @Success 200 {object} dto.GetAllDeliveryInfosResponseDto "Delivery information retrieved successfully"
-// @Failure 500 {object} fiber.Map "Failed to retrieve delivery information"
-// @Router /api/delivery-info/v1 [get]
-// @Security Bearer
-func (h *DeliveryInfoHandler) GetAllDeliveryInfos(c *fiber.Ctx) error {
-	ctx := contextUtils.GetContext(c)
-	res, err := h.deliveryService.GetAllDeliveryInfos(ctx)
-	if err != nil {
-		return apperr.WriteError(c, err)
-	}
-
-	return c.Status(fiber.StatusOK).JSON(res)
-}
-
 // GetDeliveryInfosByUserID godoc
 // @Summary Get all delivery information for a user
 // @Description Retrieve all delivery information records for a specific user
@@ -114,6 +94,82 @@ func (h *DeliveryInfoHandler) GetDeliveryInfosByUserID(c *fiber.Ctx) error {
 
 	ctx := contextUtils.GetContext(c)
 	res, err := h.deliveryService.GetDeliveryInfosByUserID(ctx, userID)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
+// GetAllDeliveryInfos godoc
+// @Summary Get all delivery information
+// @Description Retrieve all delivery information records
+// @Tags delivery-info
+// @Accept json
+// @Produce json
+// @Success 200 {object} dto.GetAllDeliveryInfosResponseDto "Delivery information retrieved successfully"
+// @Failure 500 {object} fiber.Map "Failed to retrieve delivery information"
+// @Router /api/delivery-info/v1 [get]
+// @Security Bearer
+func (h *DeliveryInfoHandler) GetAllDeliveryInfos(c *fiber.Ctx) error {
+	ctx := contextUtils.GetContext(c)
+	res, err := h.deliveryService.GetAllDeliveryInfos(ctx)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
+// UpdateDeliveryInfo godoc
+// @Summary Update delivery information
+// @Description Update an existing delivery information record
+// @Tags delivery-info
+// @Accept json
+// @Produce json
+// @Param delivery_info body dto.UpdateDeliveryInfoRequestDto true "Updated Delivery Information Data"
+// @Success 200 {object} dto.UpdateDeliveryInfoResponseDto "Delivery information updated successfully"
+// @Failure 400 {object} fiber.Map "Invalid request body or delivery information ID"
+// @Failure 404 {object} fiber.Map "Delivery information not found"
+// @Failure 500 {object} fiber.Map "Failed to update delivery information"
+// @Router /api/delivery-info/v1 [put]
+// @Security Bearer
+func (h *DeliveryInfoHandler) UpdateDeliveryInfo(c *fiber.Ctx) error {
+	var body dto.UpdateDeliveryInfoRequestDto
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body: " + err.Error()})
+	}
+
+	ctx := contextUtils.GetContext(c)
+	res, err := h.deliveryService.UpdateDeliveryInfo(ctx, body)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
+// DeleteDeliveryInfo godoc
+// @Summary Delete delivery information
+// @Description Delete an existing delivery information record
+// @Tags delivery-info
+// @Accept json
+// @Produce json
+// @Param id path string true "Delivery Information ID"
+// @Success 200 {object} dto.DeleteDeliveryInfoResponseDto "Delivery information deleted successfully"
+// @Failure 400 {object} fiber.Map "Invalid delivery information ID"
+// @Failure 404 {object} fiber.Map "Delivery information not found"
+// @Failure 500 {object} fiber.Map "Failed to delete delivery information"
+// @Router /api/delivery-info/v1/{id} [delete]
+// @Security Bearer
+func (h *DeliveryInfoHandler) DeleteDeliveryInfo(c *fiber.Ctx) error {
+	var body dto.DeleteDeliveryInfoRequestDto
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request body: " + err.Error()})
+	}
+
+	ctx := contextUtils.GetContext(c)
+	res, err := h.deliveryService.DeleteDeliveryInfo(ctx, body.ID)
 	if err != nil {
 		return apperr.WriteError(c, err)
 	}
