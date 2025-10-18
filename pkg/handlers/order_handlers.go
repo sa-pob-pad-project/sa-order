@@ -226,10 +226,11 @@ func (h *OrderHandler) CancelOrder(c *fiber.Ctx) error {
 // @Param order body dto.ApproveOrderRequestDto true "Order ID to approve"
 // @Success 200 {object} dto.ApproveOrderResponseDto "Order approved successfully"
 // @Failure 400 {object} response.ErrorResponse "Invalid request body or order ID"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
 // @Failure 403 {object} response.ErrorResponse "Forbidden - only doctors can approve their own orders"
 // @Failure 404 {object} response.ErrorResponse "Order not found"
 // @Failure 500 {object} response.ErrorResponse "Failed to approve order"
-// @Router /api/order/v1/orders/confirm [delete]
+// @Router /api/order/v1/orders/confirm [post]
 // @Security Bearer
 func (h *OrderHandler) ApproveOrder(c *fiber.Ctx) error {
 	var body dto.ApproveOrderRequestDto
