@@ -75,6 +75,23 @@ func (s *DeliveryService) GetDeliveryInfoByID(ctx context.Context, id string) (*
 	}, nil
 }
 
+// GetDeliveryInfosByUserID retrieves all delivery information records for a user
+func (s *DeliveryService) GetDeliveryInfosByUserID(ctx context.Context, userID string) (*dto.GetAllDeliveryInfosResponseDto, error) {
+	userUUID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "Invalid user ID format", err)
+	}
+
+	deliveryInfos, err := s.deliveryInfoRepository.FindByUserID(ctx, userUUID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeInternal, "Failed to retrieve delivery information", err)
+	}
+
+	return &dto.GetAllDeliveryInfosResponseDto{
+		DeliveryInfos: dto.ToDeliveryInfoDtoList(deliveryInfos),
+	}, nil
+}
+
 // GetAllDeliveryInfos retrieves all delivery information records
 func (s *DeliveryService) GetAllDeliveryInfos(ctx context.Context) (*dto.GetAllDeliveryInfosResponseDto, error) {
 	deliveryInfos, err := s.deliveryInfoRepository.FindAll(ctx)

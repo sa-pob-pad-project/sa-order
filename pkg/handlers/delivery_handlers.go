@@ -93,3 +93,30 @@ func (h *DeliveryInfoHandler) GetAllDeliveryInfos(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(res)
 }
+
+// GetDeliveryInfosByUserID godoc
+// @Summary Get all delivery information for a user
+// @Description Retrieve all delivery information records for a specific user
+// @Tags delivery-info
+// @Accept json
+// @Produce json
+// @Param user_id path string true "User ID"
+// @Success 200 {object} dto.GetAllDeliveryInfosResponseDto "Delivery information retrieved successfully"
+// @Failure 400 {object} fiber.Map "Invalid user ID"
+// @Failure 500 {object} fiber.Map "Failed to retrieve delivery information"
+// @Router /api/delivery-info/v1/user/{user_id} [get]
+// @Security Bearer
+func (h *DeliveryInfoHandler) GetDeliveryInfosByUserID(c *fiber.Ctx) error {
+	userID := c.Params("user_id")
+	if userID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "User ID is required"})
+	}
+
+	ctx := contextUtils.GetContext(c)
+	res, err := h.deliveryService.GetDeliveryInfosByUserID(ctx, userID)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
