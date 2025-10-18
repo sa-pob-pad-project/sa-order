@@ -95,3 +95,36 @@ func (h *OrderHandler) GetAllOrdersHistory(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(res)
 }
+
+// CancelOrder godoc
+// @Summary Cancel an order
+// @Description Cancel an existing order (doctor only - can only cancel their own orders)
+// @Tags orders
+// @Accept  json
+// @Produce  json
+// @Param order body dto.CancelOrderRequestDto true "Order ID to cancel"
+// @Success 200 {object} dto.CancelOrderResponseDto "Order cancelled successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid request body or order ID"
+// @Failure 403 {object} response.ErrorResponse "Forbidden - only doctors can cancel their own orders"
+// @Failure 404 {object} response.ErrorResponse "Order not found"
+// @Failure 500 {object} response.ErrorResponse "Failed to cancel order"
+// @Router /api/order/v1/orders [delete]
+// @Security Bearer
+func (h *OrderHandler) CancelOrder(c *fiber.Ctx) error {
+	var body dto.CancelOrderRequestDto
+	if err := c.BodyParser(&body); err != nil {
+		return response.BadRequest(c, "Invalid request body "+err.Error())
+	}
+
+	if body.OrderID == "" {
+		return response.BadRequest(c, "Order ID is required")
+	}
+
+	ctx := contextUtils.GetContext(c)
+	res, err := h.orderService.CancelOrder(ctx, body)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}

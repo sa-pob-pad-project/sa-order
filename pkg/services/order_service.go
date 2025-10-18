@@ -228,3 +228,41 @@ func (s *OrderService) GetAllOrdersHistoryByPatientID(ctx context.Context) (*dto
 		Total:  len(orderHistoryList),
 	}, nil
 }
+
+func (s *OrderService) CancelOrder(ctx context.Context, body dto.CancelOrderRequestDto) (*dto.CancelOrderResponseDto, error) {
+	userID := contextUtils.GetUserId(ctx)
+	role := contextUtils.GetRole(ctx)
+
+	if role != "doctor" {
+		return nil, apperr.New(apperr.CodeForbidden, "only doctors can cancel orders", nil)
+	}
+
+	parsedOrderID, err := uuid.Parse(body.OrderID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid order ID", err)
+	}
+
+	order, err := s.orderRepository.FindByID(ctx, parsedOrderID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeNotFound, "order not found", err)
+	}
+
+	doctorID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid user ID", err)
+	}
+
+	if order.DoctorID == nil || *order.DoctorID != doctorID {
+		return nil, apperr.New(apperr.CodeForbidden, "doctor can only cancel their own orders", nil)
+	}
+
+	order.Status = models.OrderStatusCancelled
+	if err := s.orderRepository.Update(ctx, order); err != nil {
+		return nil, apperr.New(apperr.CodeInternal, "failed to cancel order", err)
+	}
+
+	return &dto.CancelOrderResponseDto{
+		OrderID: order.ID.String(),
+		Status:  string(order.Status),
+	}, nil
+}
