@@ -116,7 +116,7 @@ func main() {
 	)
 
 	// Initialize Handlers
-	orderHandler := handlers.NewOrderHandler(orderService, deliveryService)
+	orderHandler := handlers.NewOrderHandler(orderService)
 	medicineHandler := handlers.NewMedicineHandler(medicineService)
 	deliveryInfoHandler := handlers.NewDeliveryInfoHandler(deliveryService)
 	validate := validator.New()

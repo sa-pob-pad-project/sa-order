@@ -15,7 +15,7 @@ type OrderHandler struct {
 	// deliveryService *service.DeliveryService
 }
 
-func NewOrderHandler(orderService *service.OrderService, deliveryService *service.DeliveryService) *OrderHandler {
+func NewOrderHandler(orderService *service.OrderService) *OrderHandler {
 	return &OrderHandler{
 		orderService: orderService,
 		// deliveryService: deliveryService,
@@ -36,7 +36,7 @@ func NewOrderHandler(orderService *service.OrderService, deliveryService *servic
 // @Failure 403 {object} response.ErrorResponse "Forbidden - only patients can create orders"
 // @Failure 500 {object} response.ErrorResponse "Failed to create order"
 // @Router /api/order/v1/orders [post]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *OrderHandler) CreateOrder(c *fiber.Ctx) error {
 	var body dto.CreateOrderRequestDto
 	if err := c.BodyParser(&body); err != nil {
@@ -65,7 +65,7 @@ func (h *OrderHandler) CreateOrder(c *fiber.Ctx) error {
 // @Failure 404 {object} response.ErrorResponse "Order not found"
 // @Failure 500 {object} response.ErrorResponse "Failed to update order"
 // @Router /api/order/v1/orders [put]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *OrderHandler) UpdateOrder(c *fiber.Ctx) error {
 
 	var body dto.UpdateOrderRequestDto
@@ -95,7 +95,7 @@ func (h *OrderHandler) UpdateOrder(c *fiber.Ctx) error {
 // @Failure 404 {object} response.ErrorResponse "Order not found"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve order"
 // @Router /api/order/v1/orders/{id} [get]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *OrderHandler) GetOrder(c *fiber.Ctx) error {
 	orderID := c.Params("id")
 	if orderID == "" {
@@ -121,7 +121,7 @@ func (h *OrderHandler) GetOrder(c *fiber.Ctx) error {
 // @Failure 401 {object} response.ErrorResponse "Unauthorized"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve orders"
 // @Router /api/order/v1/orders [get]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *OrderHandler) GetAllOrdersHistory(c *fiber.Ctx) error {
 	ctx := contextUtils.GetContext(c)
 	res, err := h.orderService.GetAllOrdersHistoryByPatientID(ctx)
@@ -143,7 +143,7 @@ func (h *OrderHandler) GetAllOrdersHistory(c *fiber.Ctx) error {
 // @Failure 404 {object} response.ErrorResponse "No orders found"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve order"
 // @Router /api/order/v1/orders/latest [get]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *OrderHandler) GetLatestOrder(c *fiber.Ctx) error {
 	ctx := contextUtils.GetContext(c)
 	res, err := h.orderService.GetLatestOrderByPatientID(ctx)
@@ -167,7 +167,7 @@ func (h *OrderHandler) GetLatestOrder(c *fiber.Ctx) error {
 // @Failure 404 {object} response.ErrorResponse "No orders found for this patient"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve order"
 // @Router /api/order/v1/orders/latest/{patient_id} [get]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *OrderHandler) GetLatestOrderByPatientID(c *fiber.Ctx) error {
 	patientID := c.Params("patient_id")
 	if patientID == "" {
@@ -197,7 +197,7 @@ func (h *OrderHandler) GetLatestOrderByPatientID(c *fiber.Ctx) error {
 // @Failure 404 {object} response.ErrorResponse "Order not found"
 // @Failure 500 {object} response.ErrorResponse "Failed to cancel order"
 // @Router /api/order/v1/orders [delete]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *OrderHandler) CancelOrder(c *fiber.Ctx) error {
 	var body dto.CancelOrderRequestDto
 	if err := c.BodyParser(&body); err != nil {
@@ -231,7 +231,7 @@ func (h *OrderHandler) CancelOrder(c *fiber.Ctx) error {
 // @Failure 404 {object} response.ErrorResponse "Order not found"
 // @Failure 500 {object} response.ErrorResponse "Failed to approve order"
 // @Router /api/order/v1/orders/confirm [post]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *OrderHandler) ApproveOrder(c *fiber.Ctx) error {
 	var body dto.ApproveOrderRequestDto
 	if err := c.BodyParser(&body); err != nil {

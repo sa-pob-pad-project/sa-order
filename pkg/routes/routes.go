@@ -46,9 +46,8 @@ func SetupRoutes(app *fiber.App, orderHandler *handlers.OrderHandler, medicineHa
 	deliveryInfoV1 := deliveryInfo.Group("/v1")
 	deliveryInfoV1.Use(middleware.JwtMiddleware(jwtSvc))
 	deliveryInfoV1.Post("/", deliveryInfoHandler.CreateDeliveryInfo)
-	deliveryInfoV1.Get("/", deliveryInfoHandler.GetAllDeliveryInfos)
-	deliveryInfoV1.Get("/:id", deliveryInfoHandler.GetDeliveryInfo)
-	deliveryInfoV1.Get("/user/:user_id", deliveryInfoHandler.GetDeliveryInfosByUserID)
 	deliveryInfoV1.Put("/", deliveryInfoHandler.UpdateDeliveryInfo)
 	deliveryInfoV1.Delete("/", deliveryInfoHandler.DeleteDeliveryInfo)
+	deliveryInfoV1.Get("/", deliveryInfoHandler.GetAllDeliveryInfos)
+	deliveryInfoV1.Get("/:id", deliveryInfoHandler.GetDeliveryInfo) // payment id
 }

@@ -31,7 +31,7 @@ func NewDeliveryInfoHandler(deliveryService *service.DeliveryService) *DeliveryI
 // @Failure 401 {object} response.ErrorResponse "Unauthorized"
 // @Failure 500 {object} response.ErrorResponse "Failed to create delivery information"
 // @Router /api/delivery-info/v1 [post]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *DeliveryInfoHandler) CreateDeliveryInfo(c *fiber.Ctx) error {
 	var body dto.CreateDeliveryInfoRequestDto
 	if err := c.BodyParser(&body); err != nil {
@@ -60,7 +60,7 @@ func (h *DeliveryInfoHandler) CreateDeliveryInfo(c *fiber.Ctx) error {
 // @Failure 404 {object} response.ErrorResponse "Delivery information not found"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve delivery information"
 // @Router /api/delivery-info/v1/{id} [get]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *DeliveryInfoHandler) GetDeliveryInfo(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if id == "" {
@@ -69,34 +69,6 @@ func (h *DeliveryInfoHandler) GetDeliveryInfo(c *fiber.Ctx) error {
 
 	ctx := contextUtils.GetContext(c)
 	res, err := h.deliveryService.GetDeliveryInfoByID(ctx, id)
-	if err != nil {
-		return apperr.WriteError(c, err)
-	}
-
-	return c.Status(fiber.StatusOK).JSON(res)
-}
-
-// GetDeliveryInfosByUserID godoc
-// @Summary Get all delivery information for a user
-// @Description Retrieve all delivery information records for a specific user
-// @Tags delivery-info
-// @Accept  json
-// @Produce  json
-// @Param user_id path string true "User ID"
-// @Success 200 {object} dto.GetAllDeliveryInfosResponseDto "Delivery information retrieved successfully"
-// @Failure 400 {object} response.ErrorResponse "Invalid user ID"
-// @Failure 401 {object} response.ErrorResponse "Unauthorized"
-// @Failure 500 {object} response.ErrorResponse "Failed to retrieve delivery information"
-// @Router /api/delivery-info/v1/user/{user_id} [get]
-// @Security Bearer
-func (h *DeliveryInfoHandler) GetDeliveryInfosByUserID(c *fiber.Ctx) error {
-	userID := c.Params("user_id")
-	if userID == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "User ID is required"})
-	}
-
-	ctx := contextUtils.GetContext(c)
-	res, err := h.deliveryService.GetDeliveryInfosByUserID(ctx, userID)
 	if err != nil {
 		return apperr.WriteError(c, err)
 	}
@@ -114,7 +86,7 @@ func (h *DeliveryInfoHandler) GetDeliveryInfosByUserID(c *fiber.Ctx) error {
 // @Failure 401 {object} response.ErrorResponse "Unauthorized"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve delivery information"
 // @Router /api/delivery-info/v1 [get]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *DeliveryInfoHandler) GetAllDeliveryInfos(c *fiber.Ctx) error {
 	ctx := contextUtils.GetContext(c)
 	res, err := h.deliveryService.GetAllDeliveryInfos(ctx)
@@ -138,7 +110,7 @@ func (h *DeliveryInfoHandler) GetAllDeliveryInfos(c *fiber.Ctx) error {
 // @Failure 404 {object} response.ErrorResponse "Delivery information not found"
 // @Failure 500 {object} response.ErrorResponse "Failed to update delivery information"
 // @Router /api/delivery-info/v1 [put]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *DeliveryInfoHandler) UpdateDeliveryInfo(c *fiber.Ctx) error {
 	var body dto.UpdateDeliveryInfoRequestDto
 	if err := c.BodyParser(&body); err != nil {
@@ -167,7 +139,7 @@ func (h *DeliveryInfoHandler) UpdateDeliveryInfo(c *fiber.Ctx) error {
 // @Failure 404 {object} response.ErrorResponse "Delivery information not found"
 // @Failure 500 {object} response.ErrorResponse "Failed to delete delivery information"
 // @Router /api/delivery-info/v1 [delete]
-// @Security Bearer
+// @Security ApiKeyAuth
 func (h *DeliveryInfoHandler) DeleteDeliveryInfo(c *fiber.Ctx) error {
 	var body dto.DeleteDeliveryInfoRequestDto
 	if err := c.BodyParser(&body); err != nil {
