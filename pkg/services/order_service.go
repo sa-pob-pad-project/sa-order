@@ -283,6 +283,157 @@ func (s *OrderService) GetAllOrdersHistoryByPatientID(ctx context.Context) (*dto
 	}, nil
 }
 
+func (s *OrderService) GetLatestOrderByPatientID(ctx context.Context) (*dto.GetOrderByIDResponseDto, error) {
+	userID := contextUtils.GetUserId(ctx)
+
+	patientID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid user ID", err)
+	}
+
+	order, err := s.orderRepository.FindLatestOrderByPatientID(ctx, patientID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeInternal, "failed to retrieve order", err)
+	}
+	if order == nil {
+		return nil, apperr.New(apperr.CodeNotFound, "no orders found", nil)
+	}
+
+	// Convert order items to response format
+	orderItems := make([]dto.OrderItem, len(order.OrderItems))
+	for i, item := range order.OrderItems {
+		medicineName := ""
+		if item.Medicine != nil {
+			medicineName = item.Medicine.Name
+		}
+		orderItems[i] = dto.OrderItem{
+			MedicineID:   item.MedicineID.String(),
+			MedicineName: medicineName,
+			Quantity:     item.Quantity,
+		}
+	}
+
+	// Format timestamps
+	var submittedAt, reviewedAt *string
+	if order.SubmittedAt != nil {
+		submittedAtStr := order.SubmittedAt.Format("2006-01-02T15:04:05Z07:00")
+		submittedAt = &submittedAtStr
+	}
+	if order.ReviewedAt != nil {
+		reviewedAtStr := order.ReviewedAt.Format("2006-01-02T15:04:05Z07:00")
+		reviewedAt = &reviewedAtStr
+	}
+
+	// Fetch delivery information if exists
+	var deliveryStatus, deliveryAt *string
+	delivery, err := s.deliveryRepository.FindByOrderID(ctx, order.ID)
+	if err == nil && delivery != nil {
+		status := string(delivery.Status)
+		deliveryStatus = &status
+		if delivery.DeliveredAt != nil {
+			deliveredAtStr := delivery.DeliveredAt.Format("2006-01-02T15:04:05Z07:00")
+			deliveryAt = &deliveredAtStr
+		}
+	}
+
+	return &dto.GetOrderByIDResponseDto{
+		OrderID:        order.ID.String(),
+		PatientID:      order.PatientID.String(),
+		DoctorID:       order.DoctorID.String(),
+		TotalAmount:    order.TotalAmount,
+		Note:           order.Note,
+		SubmittedAt:    submittedAt,
+		ReviewedAt:     reviewedAt,
+		Status:         string(order.Status),
+		DeliveryStatus: deliveryStatus,
+		DeliveryAt:     deliveryAt,
+		OrderItems:     orderItems,
+	}, nil
+}
+
+func (s *OrderService) GetLatestOrderByPatientIDForDoctor(ctx context.Context, patientID string) (*dto.GetOrderByIDResponseDto, error) {
+	userID := contextUtils.GetUserId(ctx)
+	role := contextUtils.GetRole(ctx)
+
+	if role != "doctor" {
+		return nil, apperr.New(apperr.CodeForbidden, "only doctors can access this endpoint", nil)
+	}
+
+	parsedPatientID, err := uuid.Parse(patientID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid patient ID", err)
+	}
+
+	order, err := s.orderRepository.FindLatestOrderByPatientID(ctx, parsedPatientID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeInternal, "failed to retrieve order", err)
+	}
+	if order == nil {
+		return nil, apperr.New(apperr.CodeNotFound, "no orders found for this patient", nil)
+	}
+
+	// Verify the doctor is the one assigned to the order
+	doctorID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid user ID", err)
+	}
+
+	if order.DoctorID == nil || *order.DoctorID != doctorID {
+		return nil, apperr.New(apperr.CodeForbidden, "doctor can only access their own patient's orders", nil)
+	}
+
+	// Convert order items to response format
+	orderItems := make([]dto.OrderItem, len(order.OrderItems))
+	for i, item := range order.OrderItems {
+		medicineName := ""
+		if item.Medicine != nil {
+			medicineName = item.Medicine.Name
+		}
+		orderItems[i] = dto.OrderItem{
+			MedicineID:   item.MedicineID.String(),
+			MedicineName: medicineName,
+			Quantity:     item.Quantity,
+		}
+	}
+
+	// Format timestamps
+	var submittedAt, reviewedAt *string
+	if order.SubmittedAt != nil {
+		submittedAtStr := order.SubmittedAt.Format("2006-01-02T15:04:05Z07:00")
+		submittedAt = &submittedAtStr
+	}
+	if order.ReviewedAt != nil {
+		reviewedAtStr := order.ReviewedAt.Format("2006-01-02T15:04:05Z07:00")
+		reviewedAt = &reviewedAtStr
+	}
+
+	// Fetch delivery information if exists
+	var deliveryStatus, deliveryAt *string
+	delivery, err := s.deliveryRepository.FindByOrderID(ctx, order.ID)
+	if err == nil && delivery != nil {
+		status := string(delivery.Status)
+		deliveryStatus = &status
+		if delivery.DeliveredAt != nil {
+			deliveredAtStr := delivery.DeliveredAt.Format("2006-01-02T15:04:05Z07:00")
+			deliveryAt = &deliveredAtStr
+		}
+	}
+
+	return &dto.GetOrderByIDResponseDto{
+		OrderID:        order.ID.String(),
+		PatientID:      order.PatientID.String(),
+		DoctorID:       order.DoctorID.String(),
+		TotalAmount:    order.TotalAmount,
+		Note:           order.Note,
+		SubmittedAt:    submittedAt,
+		ReviewedAt:     reviewedAt,
+		Status:         string(order.Status),
+		DeliveryStatus: deliveryStatus,
+		DeliveryAt:     deliveryAt,
+		OrderItems:     orderItems,
+	}, nil
+}
+
 func (s *OrderService) CancelOrder(ctx context.Context, body dto.CancelOrderRequestDto) (*dto.CancelOrderResponseDto, error) {
 	userID := contextUtils.GetUserId(ctx)
 	role := contextUtils.GetRole(ctx)

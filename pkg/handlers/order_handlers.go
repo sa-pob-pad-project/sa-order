@@ -32,8 +32,11 @@ func NewOrderHandler(orderService *service.OrderService, deliveryService *servic
 // @Param order body dto.CreateOrderRequestDto true "Order creation data"
 // @Success 201 {object} dto.CreateOrderResponseDto "Order created successfully"
 // @Failure 400 {object} response.ErrorResponse "Invalid request body"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 403 {object} response.ErrorResponse "Forbidden - only patients can create orders"
 // @Failure 500 {object} response.ErrorResponse "Failed to create order"
 // @Router /api/order/v1/orders [post]
+// @Security Bearer
 func (h *OrderHandler) CreateOrder(c *fiber.Ctx) error {
 	var body dto.CreateOrderRequestDto
 	if err := c.BodyParser(&body); err != nil {
@@ -57,10 +60,12 @@ func (h *OrderHandler) CreateOrder(c *fiber.Ctx) error {
 // @Param order body dto.UpdateOrderRequestDto true "Order update data"
 // @Success 200 {object} dto.UpdateOrderResponseDto "Order updated successfully"
 // @Failure 400 {object} response.ErrorResponse "Invalid request body or order ID"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
 // @Failure 403 {object} response.ErrorResponse "Forbidden - only doctors can update their own orders"
 // @Failure 404 {object} response.ErrorResponse "Order not found"
 // @Failure 500 {object} response.ErrorResponse "Failed to update order"
-// @Router /api/order/v1/orders/{orderId} [put]
+// @Router /api/order/v1/orders [put]
+// @Security Bearer
 func (h *OrderHandler) UpdateOrder(c *fiber.Ctx) error {
 
 	var body dto.UpdateOrderRequestDto
@@ -86,9 +91,11 @@ func (h *OrderHandler) UpdateOrder(c *fiber.Ctx) error {
 // @Param id path string true "Order ID"
 // @Success 200 {object} dto.GetOrderByIDResponseDto "Order retrieved successfully"
 // @Failure 400 {object} response.ErrorResponse "Invalid order ID"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
 // @Failure 404 {object} response.ErrorResponse "Order not found"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve order"
 // @Router /api/order/v1/orders/{id} [get]
+// @Security Bearer
 func (h *OrderHandler) GetOrder(c *fiber.Ctx) error {
 	orderID := c.Params("id")
 	if orderID == "" {
@@ -113,11 +120,62 @@ func (h *OrderHandler) GetOrder(c *fiber.Ctx) error {
 // @Success 200 {object} dto.GetAllOrdersHistoryListDto "Orders retrieved successfully"
 // @Failure 401 {object} response.ErrorResponse "Unauthorized"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve orders"
-// @Router /api/order/v1/history [get]
+// @Router /api/order/v1/orders [get]
 // @Security Bearer
 func (h *OrderHandler) GetAllOrdersHistory(c *fiber.Ctx) error {
 	ctx := contextUtils.GetContext(c)
 	res, err := h.orderService.GetAllOrdersHistoryByPatientID(ctx)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
+// GetLatestOrder godoc
+// @Summary Get latest order for the current patient
+// @Description Retrieve the most recent order for the authenticated patient
+// @Tags orders
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} dto.GetOrderByIDResponseDto "Order retrieved successfully"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 404 {object} response.ErrorResponse "No orders found"
+// @Failure 500 {object} response.ErrorResponse "Failed to retrieve order"
+// @Router /api/order/v1/orders/latest [get]
+// @Security Bearer
+func (h *OrderHandler) GetLatestOrder(c *fiber.Ctx) error {
+	ctx := contextUtils.GetContext(c)
+	res, err := h.orderService.GetLatestOrderByPatientID(ctx)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
+// GetLatestOrderByPatientID godoc
+// @Summary Get latest order for a specific patient (doctor only)
+// @Description Retrieve the most recent order for a specific patient. Only the assigned doctor can access this endpoint.
+// @Tags orders
+// @Accept  json
+// @Produce  json
+// @Param patient_id path string true "Patient ID"
+// @Success 200 {object} dto.GetOrderByIDResponseDto "Order retrieved successfully"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 403 {object} response.ErrorResponse "Forbidden - doctor can only access their own patient's orders"
+// @Failure 404 {object} response.ErrorResponse "No orders found for this patient"
+// @Failure 500 {object} response.ErrorResponse "Failed to retrieve order"
+// @Router /api/order/v1/orders/latest/{patient_id} [get]
+// @Security Bearer
+func (h *OrderHandler) GetLatestOrderByPatientID(c *fiber.Ctx) error {
+	patientID := c.Params("patient_id")
+	if patientID == "" {
+		return response.BadRequest(c, "Patient ID is required")
+	}
+
+	ctx := contextUtils.GetContext(c)
+	res, err := h.orderService.GetLatestOrderByPatientIDForDoctor(ctx, patientID)
 	if err != nil {
 		return apperr.WriteError(c, err)
 	}
@@ -134,6 +192,7 @@ func (h *OrderHandler) GetAllOrdersHistory(c *fiber.Ctx) error {
 // @Param order body dto.CancelOrderRequestDto true "Order ID to cancel"
 // @Success 200 {object} dto.CancelOrderResponseDto "Order cancelled successfully"
 // @Failure 400 {object} response.ErrorResponse "Invalid request body or order ID"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
 // @Failure 403 {object} response.ErrorResponse "Forbidden - only doctors can cancel their own orders"
 // @Failure 404 {object} response.ErrorResponse "Order not found"
 // @Failure 500 {object} response.ErrorResponse "Failed to cancel order"
