@@ -84,6 +84,60 @@ func (s *OrderService) CreateOrder(ctx context.Context, body dto.CreateOrderRequ
 	}, nil
 }
 
+func (s *OrderService) UpdateOrder(ctx context.Context, body dto.UpdateOrderRequestDto) (*dto.UpdateOrderResponseDto, error) {
+	userID := contextUtils.GetUserId(ctx)
+	role := contextUtils.GetRole(ctx)
+
+	if role != "doctor" {
+		return nil, apperr.New(apperr.CodeForbidden, "only doctors can update orders", nil)
+	}
+	orderID := body.OrderID
+	parsedOrderID, err := uuid.Parse(orderID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid order ID", err)
+	}
+
+	order, err := s.orderRepository.FindByID(ctx, parsedOrderID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeNotFound, "order not found", err)
+	}
+
+	doctorID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid user ID", err)
+	}
+
+	if order.DoctorID == nil || *order.DoctorID != doctorID {
+		return nil, apperr.New(apperr.CodeForbidden, "doctor can only edit their own orders", nil)
+	}
+
+	// main logic begins here
+	// delete existing order items
+	if err := s.orderItemRepository.DeleteByOrderID(ctx, order.ID); err != nil {
+		return nil, apperr.New(apperr.CodeInternal, "failed to delete existing order items", err)
+	}
+	// add new order items
+	for _, item := range body.OrderItems {
+		medicine, err := s.medicineRepository.FindByID(ctx, item.MedicineID)
+		if err != nil {
+			return nil, apperr.New(apperr.CodeBadRequest, "medicine not found", err)
+		}
+		orderItem := &models.OrderItem{
+			ID:         utils.GenerateUUIDv7(),
+			OrderID:    order.ID,
+			MedicineID: medicine.ID,
+			Quantity:   item.Quantity,
+		}
+		if err := s.orderItemRepository.Create(ctx, orderItem); err != nil {
+			return nil, apperr.New(apperr.CodeInternal, "failed to create order item", err)
+		}
+	}
+
+	return &dto.UpdateOrderResponseDto{
+		OrderID: order.ID.String(),
+	}, nil
+}
+
 func (s *OrderService) GetOrderByID(ctx context.Context, orderID string) (*dto.GetOrderByIDResponseDto, error) {
 	parsedOrderID, err := uuid.Parse(orderID)
 	if err != nil {

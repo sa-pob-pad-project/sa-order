@@ -22,13 +22,13 @@ func SetupRoutes(app *fiber.App, orderHandler *handlers.OrderHandler, deliveryIn
 	orderV1 := order.Group("/v1")
 	orderV1.Use(middleware.JwtMiddleware(jwtSvc))
 	orderV1.Post("/orders", orderHandler.CreateOrder)
+	orderV1.Put("/orders", orderHandler.UpdateOrder)
 	orderV1.Delete("/orders", orderHandler.CancelOrder)
-	orderV1.Get("/orders/:id", orderHandler.GetOrder)
-	orderV1.Get("/orders", orderHandler.GetAllOrdersHistory)
-	// orderV1.Put("/orders", )
 	// orderV1.Post("/orders/confirm", )
 	// orderV1.Get("/orders/latest", )
 	// orderV1.Get("/orders/latest/:patient_id", )
+	orderV1.Get("/orders/:id", orderHandler.GetOrder)
+	orderV1.Get("/orders", orderHandler.GetAllOrdersHistory)
 
 	// Delivery Routes
 	delivery := api.Group("/delivery")

@@ -48,6 +48,35 @@ func (h *OrderHandler) CreateOrder(c *fiber.Ctx) error {
 	return response.Created(c, res)
 }
 
+// UpdateOrder godoc
+// @Summary Update an existing order
+// @Description Update an order (doctor only - can only edit their own orders). Can add, edit, or remove order items.
+// @Tags orders
+// @Accept  json
+// @Produce  json
+// @Param order body dto.UpdateOrderRequestDto true "Order update data"
+// @Success 200 {object} dto.UpdateOrderResponseDto "Order updated successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid request body or order ID"
+// @Failure 403 {object} response.ErrorResponse "Forbidden - only doctors can update their own orders"
+// @Failure 404 {object} response.ErrorResponse "Order not found"
+// @Failure 500 {object} response.ErrorResponse "Failed to update order"
+// @Router /api/order/v1/orders/{orderId} [put]
+func (h *OrderHandler) UpdateOrder(c *fiber.Ctx) error {
+
+	var body dto.UpdateOrderRequestDto
+	if err := c.BodyParser(&body); err != nil {
+		return response.BadRequest(c, "Invalid request body "+err.Error())
+	}
+
+	ctx := contextUtils.GetContext(c)
+	res, err := h.orderService.UpdateOrder(ctx, body)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
 // GetOrder godoc
 // @Summary Get an order by ID
 // @Description Retrieve order details including order items and medicine information
