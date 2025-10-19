@@ -36,10 +36,8 @@ services:
 
     networks:
       - default
-      - sa_gateway_net
-
+      
 networks:
   default:
     driver: bridge
-  sa_gateway_net:
-    external: true
+  
