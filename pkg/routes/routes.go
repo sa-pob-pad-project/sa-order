@@ -15,10 +15,11 @@ import (
 func SetupRoutes(app *fiber.App, orderHandler *handlers.OrderHandler, medicineHandler *handlers.MedicineHandler, deliveryInfoHandler *handlers.DeliveryInfoHandler, jwtSvc *jwt.JwtService) {
 
 	api := app.Group("/api")
-	api.Get("/swagger/*", swagger.HandlerDefault)
 
 	// Order Routes
 	order := api.Group("/order")
+	order.Get("/swagger/*", swagger.HandlerDefault)
+
 	orderV1 := order.Group("/v1")
 	orderV1.Use(middleware.JwtMiddleware(jwtSvc))
 	orderV1.Post("/orders", orderHandler.CreateOrder)
