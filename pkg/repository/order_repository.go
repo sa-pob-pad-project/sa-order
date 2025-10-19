@@ -46,7 +46,7 @@ func (r *OrderRepository) Create(ctx context.Context, order *models.Order) error
 
 func (r *OrderRepository) FindLatestOrderByPatientID(ctx context.Context, patientID uuid.UUID) (*models.Order, error) {
 	var order models.Order
-	if err := r.db.WithContext(ctx).Preload("OrderItems.Medicine").Where("patient_id = ?", patientID).Order("created_at DESC").First(&order).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("OrderItems.Medicine").Where("patient_id = ? AND status != 'pending'", patientID).Order("created_at DESC").First(&order).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}

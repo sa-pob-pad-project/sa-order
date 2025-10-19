@@ -368,11 +368,10 @@ func (s *OrderService) GetLatestOrderByPatientIDForDoctor(ctx context.Context, p
 	if err != nil {
 		return nil, apperr.New(apperr.CodeInternal, "failed to retrieve order", err)
 	}
-	if order == nil {
-		return nil, apperr.New(apperr.CodeNotFound, "no orders found for this patient", nil)
+	if order == nil { // return empty response if no orders found
+		return nil, nil
 	}
 
-	// Verify the doctor is the one assigned to the order
 	doctorID, err := uuid.Parse(userID)
 	if err != nil {
 		return nil, apperr.New(apperr.CodeBadRequest, "invalid user ID", err)
