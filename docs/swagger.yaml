@@ -265,11 +265,11 @@ definitions:
       error:
         type: string
     type: object
-host: localhost:8080
+host: localhost:8082
 info:
   contact: {}
   description: This is a sample server for a user API.
-  title: User API
+  title: Order API
   version: "1.0"
 paths:
   /api/delivery-info/v1:
@@ -808,10 +808,4 @@ paths:
       - orders
 schemes:
 - http
-securityDefinitions:
-  ApiKeyAuth:
-    description: Type "Bearer" followed by a space and JWT token.
-    in: header
-    name: Authorization
-    type: apiKey
 swagger: "2.0"

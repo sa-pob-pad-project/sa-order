@@ -1257,24 +1257,16 @@ const docTemplate = `{
                 }
             }
         }
-    },
-    "securityDefinitions": {
-        "ApiKeyAuth": {
-            "description": "Type \"Bearer\" followed by a space and JWT token.",
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
-        }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "localhost:8082",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
-	Title:            "User API",
+	Title:            "Order API",
 	Description:      "This is a sample server for a user API.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
