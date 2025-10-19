@@ -28,8 +28,9 @@ func SetupRoutes(app *fiber.App, orderHandler *handlers.OrderHandler, medicineHa
 	orderV1.Post("/orders/confirm", orderHandler.ApproveOrder)
 	orderV1.Get("/orders/latest", orderHandler.GetLatestOrder)
 	orderV1.Get("/orders/latest/:patient_id", orderHandler.GetLatestOrderByPatientID)
-	orderV1.Get("/orders/:id", orderHandler.GetOrder)
 	orderV1.Get("/orders", orderHandler.GetAllOrdersHistory)
+	orderV1.Get("/orders/doctor", orderHandler.GetAllOrdersForDoctor)
+	orderV1.Get("/orders/:id", orderHandler.GetOrder)
 
 	// Medicine Routes
 	medicine := api.Group("/medicine")

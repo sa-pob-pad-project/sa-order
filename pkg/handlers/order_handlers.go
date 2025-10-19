@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"order-service/pkg/apperr"
 	contextUtils "order-service/pkg/context"
 	"order-service/pkg/dto"
@@ -98,6 +99,7 @@ func (h *OrderHandler) UpdateOrder(c *fiber.Ctx) error {
 // @Security ApiKeyAuth
 func (h *OrderHandler) GetOrder(c *fiber.Ctx) error {
 	orderID := c.Params("id")
+	fmt.Println("id hit")
 	if orderID == "" {
 		return response.BadRequest(c, "Order ID is required")
 	}
@@ -244,6 +246,28 @@ func (h *OrderHandler) ApproveOrder(c *fiber.Ctx) error {
 
 	ctx := contextUtils.GetContext(c)
 	res, err := h.orderService.ApproveOrder(ctx, body)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
+// GetAllOrdersForDoctor godoc
+// @Summary Get all orders for the current doctor
+// @Description Retrieve all orders created by the authenticated doctor with patient information
+// @Tags orders
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} dto.GetAllOrdersForDoctorListDto "Orders retrieved successfully"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 403 {object} response.ErrorResponse "Forbidden - only doctors can access this endpoint"
+// @Failure 500 {object} response.ErrorResponse "Failed to retrieve orders"
+// @Router /api/order/v1/orders/doctor [get]
+// @Security ApiKeyAuth
+func (h *OrderHandler) GetAllOrdersForDoctor(c *fiber.Ctx) error {
+	ctx := contextUtils.GetContext(c)
+	res, err := h.orderService.GetAllOrdersByDoctorID(ctx)
 	if err != nil {
 		return apperr.WriteError(c, err)
 	}
