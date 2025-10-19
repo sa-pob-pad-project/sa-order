@@ -15,155 +15,14 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/user/v1/doctor/login": {
-            "post": {
-                "description": "Authenticate a doctor and return access token with cookie",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "doctors"
-                ],
-                "summary": "Login a doctor",
-                "parameters": [
-                    {
-                        "description": "Doctor login credentials",
-                        "name": "doctor",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.DoctorLoginRequestDto"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Doctor logged in successfully",
-                        "schema": {
-                            "$ref": "#/definitions/dto.DoctorLoginResponseDto"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request body",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Invalid credentials",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/user/v1/doctors": {
-            "post": {
-                "description": "Get multiple doctor profiles by their IDs",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "doctors"
-                ],
-                "summary": "Get doctors by IDs",
-                "parameters": [
-                    {
-                        "description": "Doctor IDs",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GetDoctorsByIDsRequestDto"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Doctor profiles retrieved successfully",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/user-service_pkg_dto.GetDoctorProfileResponseDto"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Doctors not found",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to get doctor profiles",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/user/v1/patient/login": {
-            "post": {
-                "description": "Authenticate a patient and return access token",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "patients"
-                ],
-                "summary": "Login a patient",
-                "parameters": [
-                    {
-                        "description": "Patient login credentials",
-                        "name": "patient",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.PatientLoginRequestDto"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Patient logged in successfully",
-                        "schema": {
-                            "$ref": "#/definitions/dto.PatientLoginResponseDto"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid request body",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Invalid credentials",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/user/v1/patient/me": {
+        "/api/delivery-info/v1": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get the profile information of the authenticated patient",
+                "description": "Retrieve all delivery information records",
                 "consumes": [
                     "application/json"
                 ],
@@ -171,24 +30,24 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "patients"
+                    "delivery-info"
                 ],
-                "summary": "Get patient profile",
+                "summary": "Get all delivery information",
                 "responses": {
                     "200": {
-                        "description": "Profile retrieved successfully",
+                        "description": "Delivery information retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/dto.GetProfileResponseDto"
+                            "$ref": "#/definitions/dto.GetAllDeliveryInfosResponseDto"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - Invalid or missing token",
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Failed to get user profile",
+                        "description": "Failed to retrieve delivery information",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -201,7 +60,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Update the profile information of the authenticated patient",
+                "description": "Update an existing delivery information record",
                 "consumes": [
                     "application/json"
                 ],
@@ -209,51 +68,60 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "patients"
+                    "delivery-info"
                 ],
-                "summary": "Update patient profile",
+                "summary": "Update delivery information",
                 "parameters": [
                     {
-                        "description": "Patient profile update data",
-                        "name": "patient",
+                        "description": "Updated Delivery Information Data",
+                        "name": "delivery_info",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdatePatientProfileRequestDto"
+                            "$ref": "#/definitions/dto.UpdateDeliveryInfoRequestDto"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Profile updated successfully",
+                        "description": "Delivery information updated successfully",
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdatePatientProfileResponseDto"
+                            "$ref": "#/definitions/dto.UpdateDeliveryInfoResponseDto"
                         }
                     },
                     "400": {
-                        "description": "Invalid request body or user not found",
+                        "description": "Invalid request body or delivery information ID",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - Invalid or missing token",
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Delivery information not found",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Failed to update user profile",
+                        "description": "Failed to update delivery information",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     }
                 }
-            }
-        },
-        "/api/user/v1/patient/register": {
+            },
             "post": {
-                "description": "Register a new patient in the system",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new delivery information record",
                 "consumes": [
                     "application/json"
                 ],
@@ -261,25 +129,25 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "patients"
+                    "delivery-info"
                 ],
-                "summary": "Register a new patient",
+                "summary": "Create a new delivery information",
                 "parameters": [
                     {
-                        "description": "Patient registration data",
-                        "name": "patient",
+                        "description": "Delivery Information Data",
+                        "name": "delivery_info",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PatientRegisterPatientRequestDto"
+                            "$ref": "#/definitions/dto.CreateDeliveryInfoRequestDto"
                         }
                     }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Patient registered successfully",
+                        "description": "Delivery information created successfully",
                         "schema": {
-                            "$ref": "#/definitions/dto.PatientRegisterResponseDto"
+                            "$ref": "#/definitions/dto.CreateDeliveryInfoResponseDto"
                         }
                     },
                     "400": {
@@ -288,18 +156,27 @@ const docTemplate = `{
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
                     "500": {
-                        "description": "Failed to register user",
+                        "description": "Failed to create delivery information",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     }
                 }
-            }
-        },
-        "/api/user/v1/patients": {
-            "post": {
-                "description": "Get multiple patient profiles by their IDs",
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Delete an existing delivery information record",
                 "consumes": [
                     "application/json"
                 ],
@@ -307,38 +184,659 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "patients"
+                    "delivery-info"
                 ],
-                "summary": "Get patients by IDs",
+                "summary": "Delete delivery information",
                 "parameters": [
                     {
-                        "description": "Patient IDs",
-                        "name": "body",
+                        "description": "Delivery Information ID to delete",
+                        "name": "delivery_info",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.GetPatientsByIDsRequestDto"
+                            "$ref": "#/definitions/dto.DeleteDeliveryInfoRequestDto"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Patient profiles retrieved successfully",
+                        "description": "Delivery information deleted successfully",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/dto.GetProfileResponseDto"
-                            }
+                            "$ref": "#/definitions/dto.DeleteDeliveryInfoResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid delivery information ID",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "Patients not found",
+                        "description": "Delivery information not found",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Failed to get patient profiles",
+                        "description": "Failed to delete delivery information",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/delivery-info/v1/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve delivery information details by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "delivery-info"
+                ],
+                "summary": "Get delivery information by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Delivery Information ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delivery information retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetDeliveryInfoResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid delivery information ID",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Delivery information not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve delivery information",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/medicine/v1/medicines": {
+            "get": {
+                "description": "Retrieve all available medicines from the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "medicines"
+                ],
+                "summary": "Get all medicines",
+                "responses": {
+                    "200": {
+                        "description": "Medicines retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetAllMedicinesResponseDto"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve medicines",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/medicine/v1/medicines/{id}": {
+            "get": {
+                "description": "Retrieve medicine details by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "medicines"
+                ],
+                "summary": "Get medicine by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Medicine ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Medicine retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetMedicineByIDResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid medicine ID",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Medicine not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve medicine",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/v1/orders": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve all orders for the authenticated patient from JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get all orders history for the current patient",
+                "responses": {
+                    "200": {
+                        "description": "Orders retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetAllOrdersHistoryListDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve orders",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Update an order (doctor only - can only edit their own orders). Can add, edit, or remove order items.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Update an existing order",
+                "parameters": [
+                    {
+                        "description": "Order update data",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateOrderRequestDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateOrderResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or order ID",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - only doctors can update their own orders",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to update order",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new order in the system",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Create a new order",
+                "parameters": [
+                    {
+                        "description": "Order creation data",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateOrderRequestDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Order created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateOrderResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - only patients can create orders",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to create order",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Cancel an existing order (doctor only - can only cancel their own orders)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Cancel an order",
+                "parameters": [
+                    {
+                        "description": "Order ID to cancel",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CancelOrderRequestDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order cancelled successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CancelOrderResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or order ID",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - only doctors can cancel their own orders",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to cancel order",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/v1/orders/confirm": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Approve an existing order (doctor only - can only approve their own orders). Sets order status to approved.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Approve an order",
+                "parameters": [
+                    {
+                        "description": "Order ID to approve",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApproveOrderRequestDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order approved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ApproveOrderResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or order ID",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - only doctors can approve their own orders",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to approve order",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/v1/orders/latest": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve the most recent order for the authenticated patient",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get latest order for the current patient",
+                "responses": {
+                    "200": {
+                        "description": "Order retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetOrderByIDResponseDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "No orders found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve order",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/v1/orders/latest/{patient_id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve the most recent order for a specific patient. Only the assigned doctor can access this endpoint.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get latest order for a specific patient (doctor only)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Patient ID",
+                        "name": "patient_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetOrderByIDResponseDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - doctor can only access their own patient's orders",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "No orders found for this patient",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve order",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/v1/orders/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve order details including order items and medicine information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get an order by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetOrderByIDResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid order ID",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve order",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -348,207 +846,361 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.DoctorLoginRequestDto": {
+        "dto.ApproveOrderRequestDto": {
             "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
             "properties": {
-                "password": {
-                    "type": "string",
-                    "minLength": 8
+                "order_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.ApproveOrderResponseDto": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "type": "string"
                 },
-                "username": {
+                "status": {
                     "type": "string"
                 }
             }
         },
-        "dto.DoctorLoginResponseDto": {
+        "dto.CancelOrderRequestDto": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "order_id": {
                     "type": "string"
                 }
             }
         },
-        "dto.GetDoctorsByIDsRequestDto": {
+        "dto.CancelOrderResponseDto": {
             "type": "object",
-            "required": [
-                "doctor_ids"
-            ],
             "properties": {
-                "doctor_ids": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
+                "order_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
-        "dto.GetPatientsByIDsRequestDto": {
+        "dto.CreateDeliveryInfoRequestDto": {
             "type": "object",
             "required": [
-                "patient_ids"
+                "address",
+                "delivery_method",
+                "phone_number"
             ],
             "properties": {
-                "patient_ids": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
+                "address": {
+                    "type": "string"
+                },
+                "delivery_method": {
+                    "enum": [
+                        "flash",
+                        "pick_up"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.DeliveryMethodEnum"
+                        }
+                    ]
+                },
+                "phone_number": {
+                    "type": "string"
                 }
             }
         },
-        "dto.GetProfileResponseDto": {
+        "dto.CreateDeliveryInfoResponseDto": {
+            "type": "object",
+            "properties": {
+                "delivery_info": {
+                    "$ref": "#/definitions/dto.DeliveryInfoDto"
+                }
+            }
+        },
+        "dto.CreateOrderRequestDto": {
+            "type": "object",
+            "properties": {
+                "note": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateOrderResponseDto": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DeleteDeliveryInfoRequestDto": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DeleteDeliveryInfoResponseDto": {
+            "type": "object",
+            "properties": {
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DeliveryInfoDto": {
             "type": "object",
             "properties": {
                 "address": {
                     "type": "string"
                 },
-                "allergies": {
+                "created_at": {
                     "type": "string"
                 },
-                "birth_date": {
+                "delivery_method": {
+                    "$ref": "#/definitions/models.DeliveryMethodEnum"
+                },
+                "id": {
                     "type": "string"
                 },
-                "blood_type": {
+                "phone_number": {
                     "type": "string"
                 },
-                "emergency_contact": {
+                "user_id": {
                     "type": "string"
                 },
-                "first_name": {
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GetAllDeliveryInfosResponseDto": {
+            "type": "object",
+            "properties": {
+                "delivery_infos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DeliveryInfoDto"
+                    }
+                }
+            }
+        },
+        "dto.GetAllMedicinesResponseDto": {
+            "type": "object",
+            "properties": {
+                "medicines": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.MedicineResponseDto"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GetAllOrdersHistoryListDto": {
+            "type": "object",
+            "properties": {
+                "orders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GetAllOrdersHistoryResponseDto"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GetAllOrdersHistoryResponseDto": {
+            "type": "object",
+            "properties": {
+                "created_at": {
                     "type": "string"
                 },
-                "gender": {
+                "delivery_at": {
                     "type": "string"
                 },
-                "hospital_id": {
+                "delivery_status": {
+                    "type": "string"
+                },
+                "doctor_id": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "order_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.OrderItem"
+                    }
+                },
+                "patient_id": {
+                    "type": "string"
+                },
+                "reviewed_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "submitted_at": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GetDeliveryInfoResponseDto": {
+            "type": "object",
+            "properties": {
+                "delivery_info": {
+                    "$ref": "#/definitions/dto.DeliveryInfoDto"
+                }
+            }
+        },
+        "dto.GetMedicineByIDResponseDto": {
+            "type": "object",
+            "properties": {
+                "medicine": {
+                    "$ref": "#/definitions/dto.MedicineResponseDto"
+                }
+            }
+        },
+        "dto.GetOrderByIDResponseDto": {
+            "type": "object",
+            "properties": {
+                "delivery_at": {
+                    "type": "string"
+                },
+                "delivery_status": {
+                    "type": "string"
+                },
+                "doctor_id": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "order_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.OrderItem"
+                    }
+                },
+                "patient_id": {
+                    "type": "string"
+                },
+                "reviewed_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "submitted_at": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.MedicineResponseDto": {
+            "type": "object",
+            "properties": {
+                "created_at": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "id_card_number": {
+                "name": {
                     "type": "string"
                 },
-                "last_name": {
+                "price": {
+                    "type": "number"
+                },
+                "stock": {
+                    "type": "number"
+                },
+                "unit": {
                     "type": "string"
                 },
-                "phone_number": {
+                "updated_at": {
                     "type": "string"
                 }
             }
         },
-        "dto.PatientLoginRequestDto": {
+        "dto.OrderItem": {
             "type": "object",
             "properties": {
-                "hospital_id": {
+                "medicine_id": {
                     "type": "string"
                 },
-                "password": {
+                "medicine_name": {
                     "type": "string"
+                },
+                "quantity": {
+                    "type": "number"
                 }
             }
         },
-        "dto.PatientLoginResponseDto": {
+        "dto.OrderItemInput": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "medicine_id": {
                     "type": "string"
+                },
+                "quantity": {
+                    "type": "number"
                 }
             }
         },
-        "dto.PatientRegisterPatientRequestDto": {
+        "dto.UpdateDeliveryInfoRequestDto": {
             "type": "object",
             "required": [
-                "first_name",
-                "gender",
-                "hospital_id",
-                "last_name",
-                "password"
+                "address",
+                "delivery_method",
+                "id",
+                "phone_number"
             ],
             "properties": {
                 "address": {
                     "type": "string"
                 },
-                "allergies": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "type": "string"
-                },
-                "blood_type": {
-                    "type": "string"
-                },
-                "emergency_contact": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string",
+                "delivery_method": {
                     "enum": [
-                        "male",
-                        "female",
-                        "other"
+                        "flash",
+                        "pick_up"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.DeliveryMethodEnum"
+                        }
                     ]
                 },
-                "hospital_id": {
-                    "description": "Patient specific fields",
-                    "type": "string"
-                },
-                "id_card_number": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 6
-                },
-                "phone_number": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.PatientRegisterResponseDto": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.UpdatePatientProfileRequestDto": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "allergies": {
-                    "type": "string"
-                },
-                "birth_date": {
-                    "description": "Patient specific fields",
-                    "type": "string"
-                },
-                "blood_type": {
-                    "type": "string"
-                },
-                "emergency_contact": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "id_card_number": {
-                    "type": "string"
-                },
-                "last_name": {
+                "id": {
                     "type": "string"
                 },
                 "phone_number": {
@@ -556,51 +1208,52 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UpdatePatientProfileResponseDto": {
+        "dto.UpdateDeliveryInfoResponseDto": {
             "type": "object",
             "properties": {
-                "message": {
+                "delivery_info": {
+                    "$ref": "#/definitions/dto.DeliveryInfoDto"
+                }
+            }
+        },
+        "dto.UpdateOrderRequestDto": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                },
+                "order_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.OrderItemInput"
+                    }
+                }
+            }
+        },
+        "dto.UpdateOrderResponseDto": {
+            "type": "object",
+            "properties": {
+                "order_id": {
                     "type": "string"
                 }
             }
+        },
+        "models.DeliveryMethodEnum": {
+            "type": "string",
+            "enum": [
+                "flash",
+                "pick_up"
+            ],
+            "x-enum-varnames": [
+                "DeliveryMethodFlash",
+                "DeliveryMethodPickUp"
+            ]
         },
         "response.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
                     "type": "string"
-                }
-            }
-        },
-        "user-service_pkg_dto.GetDoctorProfileResponseDto": {
-            "type": "object",
-            "properties": {
-                "bio": {
-                    "type": "string"
-                },
-                "first_name": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "phone_number": {
-                    "type": "string"
-                },
-                "specialty": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "years_experience": {
-                    "type": "integer"
                 }
             }
         }

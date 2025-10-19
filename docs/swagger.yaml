@@ -1,174 +1,269 @@
 basePath: /
 definitions:
-  dto.DoctorLoginRequestDto:
+  dto.ApproveOrderRequestDto:
     properties:
-      password:
-        minLength: 8
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
-    type: object
-  dto.DoctorLoginResponseDto:
-    properties:
-      access_token:
+      order_id:
         type: string
     type: object
-  dto.GetDoctorsByIDsRequestDto:
+  dto.ApproveOrderResponseDto:
     properties:
-      doctor_ids:
-        items:
-          type: string
-        type: array
-    required:
-    - doctor_ids
+      order_id:
+        type: string
+      status:
+        type: string
     type: object
-  dto.GetPatientsByIDsRequestDto:
+  dto.CancelOrderRequestDto:
     properties:
-      patient_ids:
-        items:
-          type: string
-        type: array
-    required:
-    - patient_ids
+      order_id:
+        type: string
     type: object
-  dto.GetProfileResponseDto:
+  dto.CancelOrderResponseDto:
+    properties:
+      order_id:
+        type: string
+      status:
+        type: string
+    type: object
+  dto.CreateDeliveryInfoRequestDto:
     properties:
       address:
         type: string
-      allergies:
+      delivery_method:
+        allOf:
+        - $ref: '#/definitions/models.DeliveryMethodEnum'
+        enum:
+        - flash
+        - pick_up
+      phone_number:
         type: string
-      birth_date:
+    required:
+    - address
+    - delivery_method
+    - phone_number
+    type: object
+  dto.CreateDeliveryInfoResponseDto:
+    properties:
+      delivery_info:
+        $ref: '#/definitions/dto.DeliveryInfoDto'
+    type: object
+  dto.CreateOrderRequestDto:
+    properties:
+      note:
         type: string
-      blood_type:
+    type: object
+  dto.CreateOrderResponseDto:
+    properties:
+      order_id:
         type: string
-      emergency_contact:
+    type: object
+  dto.DeleteDeliveryInfoRequestDto:
+    properties:
+      id:
         type: string
-      first_name:
-        type: string
-      gender:
-        type: string
-      hospital_id:
+    required:
+    - id
+    type: object
+  dto.DeleteDeliveryInfoResponseDto:
+    properties:
+      deleted_at:
         type: string
       id:
         type: string
-      id_card_number:
-        type: string
-      last_name:
-        type: string
-      phone_number:
-        type: string
     type: object
-  dto.PatientLoginRequestDto:
-    properties:
-      hospital_id:
-        type: string
-      password:
-        type: string
-    type: object
-  dto.PatientLoginResponseDto:
-    properties:
-      access_token:
-        type: string
-    type: object
-  dto.PatientRegisterPatientRequestDto:
+  dto.DeliveryInfoDto:
     properties:
       address:
         type: string
-      allergies:
+      created_at:
         type: string
-      birth_date:
+      delivery_method:
+        $ref: '#/definitions/models.DeliveryMethodEnum'
+      id:
         type: string
-      blood_type:
+      phone_number:
         type: string
-      emergency_contact:
+      user_id:
         type: string
-      first_name:
+      version:
+        type: integer
+    type: object
+  dto.GetAllDeliveryInfosResponseDto:
+    properties:
+      delivery_infos:
+        items:
+          $ref: '#/definitions/dto.DeliveryInfoDto'
+        type: array
+    type: object
+  dto.GetAllMedicinesResponseDto:
+    properties:
+      medicines:
+        items:
+          $ref: '#/definitions/dto.MedicineResponseDto'
+        type: array
+      total:
+        type: integer
+    type: object
+  dto.GetAllOrdersHistoryListDto:
+    properties:
+      orders:
+        items:
+          $ref: '#/definitions/dto.GetAllOrdersHistoryResponseDto'
+        type: array
+      total:
+        type: integer
+    type: object
+  dto.GetAllOrdersHistoryResponseDto:
+    properties:
+      created_at:
         type: string
-      gender:
+      delivery_at:
+        type: string
+      delivery_status:
+        type: string
+      doctor_id:
+        type: string
+      note:
+        type: string
+      order_id:
+        type: string
+      order_items:
+        items:
+          $ref: '#/definitions/dto.OrderItem'
+        type: array
+      patient_id:
+        type: string
+      reviewed_at:
+        type: string
+      status:
+        type: string
+      submitted_at:
+        type: string
+      total_amount:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  dto.GetDeliveryInfoResponseDto:
+    properties:
+      delivery_info:
+        $ref: '#/definitions/dto.DeliveryInfoDto'
+    type: object
+  dto.GetMedicineByIDResponseDto:
+    properties:
+      medicine:
+        $ref: '#/definitions/dto.MedicineResponseDto'
+    type: object
+  dto.GetOrderByIDResponseDto:
+    properties:
+      delivery_at:
+        type: string
+      delivery_status:
+        type: string
+      doctor_id:
+        type: string
+      note:
+        type: string
+      order_id:
+        type: string
+      order_items:
+        items:
+          $ref: '#/definitions/dto.OrderItem'
+        type: array
+      patient_id:
+        type: string
+      reviewed_at:
+        type: string
+      status:
+        type: string
+      submitted_at:
+        type: string
+      total_amount:
+        type: number
+    type: object
+  dto.MedicineResponseDto:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: number
+      unit:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.OrderItem:
+    properties:
+      medicine_id:
+        type: string
+      medicine_name:
+        type: string
+      quantity:
+        type: number
+    type: object
+  dto.OrderItemInput:
+    properties:
+      medicine_id:
+        type: string
+      quantity:
+        type: number
+    type: object
+  dto.UpdateDeliveryInfoRequestDto:
+    properties:
+      address:
+        type: string
+      delivery_method:
+        allOf:
+        - $ref: '#/definitions/models.DeliveryMethodEnum'
         enum:
-        - male
-        - female
-        - other
-        type: string
-      hospital_id:
-        description: Patient specific fields
-        type: string
-      id_card_number:
-        type: string
-      last_name:
-        type: string
-      password:
-        minLength: 6
+        - flash
+        - pick_up
+      id:
         type: string
       phone_number:
         type: string
     required:
-    - first_name
-    - gender
-    - hospital_id
-    - last_name
-    - password
+    - address
+    - delivery_method
+    - id
+    - phone_number
     type: object
-  dto.PatientRegisterResponseDto:
+  dto.UpdateDeliveryInfoResponseDto:
     properties:
-      message:
-        type: string
+      delivery_info:
+        $ref: '#/definitions/dto.DeliveryInfoDto'
     type: object
-  dto.UpdatePatientProfileRequestDto:
+  dto.UpdateOrderRequestDto:
     properties:
-      address:
+      order_id:
         type: string
-      allergies:
-        type: string
-      birth_date:
-        description: Patient specific fields
-        type: string
-      blood_type:
-        type: string
-      emergency_contact:
-        type: string
-      first_name:
-        type: string
-      id_card_number:
-        type: string
-      last_name:
-        type: string
-      phone_number:
-        type: string
+      order_items:
+        items:
+          $ref: '#/definitions/dto.OrderItemInput'
+        type: array
     type: object
-  dto.UpdatePatientProfileResponseDto:
+  dto.UpdateOrderResponseDto:
     properties:
-      message:
+      order_id:
         type: string
     type: object
+  models.DeliveryMethodEnum:
+    enum:
+    - flash
+    - pick_up
+    type: string
+    x-enum-varnames:
+    - DeliveryMethodFlash
+    - DeliveryMethodPickUp
   response.ErrorResponse:
     properties:
       error:
         type: string
-    type: object
-  user-service_pkg_dto.GetDoctorProfileResponseDto:
-    properties:
-      bio:
-        type: string
-      first_name:
-        type: string
-      gender:
-        type: string
-      id:
-        type: string
-      last_name:
-        type: string
-      phone_number:
-        type: string
-      specialty:
-        type: string
-      username:
-        type: string
-      years_experience:
-        type: integer
     type: object
 host: localhost:8080
 info:
@@ -177,220 +272,540 @@ info:
   title: User API
   version: "1.0"
 paths:
-  /api/user/v1/doctor/login:
-    post:
+  /api/delivery-info/v1:
+    delete:
       consumes:
       - application/json
-      description: Authenticate a doctor and return access token with cookie
+      description: Delete an existing delivery information record
       parameters:
-      - description: Doctor login credentials
+      - description: Delivery Information ID to delete
         in: body
-        name: doctor
+        name: delivery_info
         required: true
         schema:
-          $ref: '#/definitions/dto.DoctorLoginRequestDto'
+          $ref: '#/definitions/dto.DeleteDeliveryInfoRequestDto'
       produces:
       - application/json
       responses:
         "200":
-          description: Doctor logged in successfully
+          description: Delivery information deleted successfully
           schema:
-            $ref: '#/definitions/dto.DoctorLoginResponseDto'
+            $ref: '#/definitions/dto.DeleteDeliveryInfoResponseDto'
         "400":
-          description: Invalid request body
+          description: Invalid delivery information ID
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Invalid credentials
+          description: Unauthorized
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-      summary: Login a doctor
-      tags:
-      - doctors
-  /api/user/v1/doctors:
-    post:
-      consumes:
-      - application/json
-      description: Get multiple doctor profiles by their IDs
-      parameters:
-      - description: Doctor IDs
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GetDoctorsByIDsRequestDto'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Doctor profiles retrieved successfully
-          schema:
-            items:
-              $ref: '#/definitions/user-service_pkg_dto.GetDoctorProfileResponseDto'
-            type: array
         "404":
-          description: Doctors not found
+          description: Delivery information not found
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to get doctor profiles
+          description: Failed to delete delivery information
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-      summary: Get doctors by IDs
+      security:
+      - ApiKeyAuth: []
+      summary: Delete delivery information
       tags:
-      - doctors
-  /api/user/v1/patient/login:
-    post:
-      consumes:
-      - application/json
-      description: Authenticate a patient and return access token
-      parameters:
-      - description: Patient login credentials
-        in: body
-        name: patient
-        required: true
-        schema:
-          $ref: '#/definitions/dto.PatientLoginRequestDto'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Patient logged in successfully
-          schema:
-            $ref: '#/definitions/dto.PatientLoginResponseDto'
-        "400":
-          description: Invalid request body
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "401":
-          description: Invalid credentials
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-      summary: Login a patient
-      tags:
-      - patients
-  /api/user/v1/patient/me:
+      - delivery-info
     get:
       consumes:
       - application/json
-      description: Get the profile information of the authenticated patient
+      description: Retrieve all delivery information records
       produces:
       - application/json
       responses:
         "200":
-          description: Profile retrieved successfully
+          description: Delivery information retrieved successfully
           schema:
-            $ref: '#/definitions/dto.GetProfileResponseDto'
+            $ref: '#/definitions/dto.GetAllDeliveryInfosResponseDto'
         "401":
-          description: Unauthorized - Invalid or missing token
+          description: Unauthorized
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to get user profile
+          description: Failed to retrieve delivery information
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get patient profile
+      summary: Get all delivery information
       tags:
-      - patients
-    put:
-      consumes:
-      - application/json
-      description: Update the profile information of the authenticated patient
-      parameters:
-      - description: Patient profile update data
-        in: body
-        name: patient
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UpdatePatientProfileRequestDto'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Profile updated successfully
-          schema:
-            $ref: '#/definitions/dto.UpdatePatientProfileResponseDto'
-        "400":
-          description: Invalid request body or user not found
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "401":
-          description: Unauthorized - Invalid or missing token
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-        "500":
-          description: Failed to update user profile
-          schema:
-            $ref: '#/definitions/response.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Update patient profile
-      tags:
-      - patients
-  /api/user/v1/patient/register:
+      - delivery-info
     post:
       consumes:
       - application/json
-      description: Register a new patient in the system
+      description: Create a new delivery information record
       parameters:
-      - description: Patient registration data
+      - description: Delivery Information Data
         in: body
-        name: patient
+        name: delivery_info
         required: true
         schema:
-          $ref: '#/definitions/dto.PatientRegisterPatientRequestDto'
+          $ref: '#/definitions/dto.CreateDeliveryInfoRequestDto'
       produces:
       - application/json
       responses:
         "201":
-          description: Patient registered successfully
+          description: Delivery information created successfully
           schema:
-            $ref: '#/definitions/dto.PatientRegisterResponseDto'
+            $ref: '#/definitions/dto.CreateDeliveryInfoResponseDto'
         "400":
           description: Invalid request body
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-        "500":
-          description: Failed to register user
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-      summary: Register a new patient
+        "500":
+          description: Failed to create delivery information
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new delivery information
       tags:
-      - patients
-  /api/user/v1/patients:
-    post:
+      - delivery-info
+    put:
       consumes:
       - application/json
-      description: Get multiple patient profiles by their IDs
+      description: Update an existing delivery information record
       parameters:
-      - description: Patient IDs
+      - description: Updated Delivery Information Data
         in: body
-        name: body
+        name: delivery_info
         required: true
         schema:
-          $ref: '#/definitions/dto.GetPatientsByIDsRequestDto'
+          $ref: '#/definitions/dto.UpdateDeliveryInfoRequestDto'
       produces:
       - application/json
       responses:
         "200":
-          description: Patient profiles retrieved successfully
+          description: Delivery information updated successfully
           schema:
-            items:
-              $ref: '#/definitions/dto.GetProfileResponseDto'
-            type: array
+            $ref: '#/definitions/dto.UpdateDeliveryInfoResponseDto'
+        "400":
+          description: Invalid request body or delivery information ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
         "404":
-          description: Patients not found
+          description: Delivery information not found
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to get patient profiles
+          description: Failed to update delivery information
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-      summary: Get patients by IDs
+      security:
+      - ApiKeyAuth: []
+      summary: Update delivery information
       tags:
-      - patients
+      - delivery-info
+  /api/delivery-info/v1/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve delivery information details by ID
+      parameters:
+      - description: Delivery Information ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Delivery information retrieved successfully
+          schema:
+            $ref: '#/definitions/dto.GetDeliveryInfoResponseDto'
+        "400":
+          description: Invalid delivery information ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Delivery information not found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve delivery information
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get delivery information by ID
+      tags:
+      - delivery-info
+  /api/medicine/v1/medicines:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all available medicines from the system
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Medicines retrieved successfully
+          schema:
+            $ref: '#/definitions/dto.GetAllMedicinesResponseDto'
+        "500":
+          description: Failed to retrieve medicines
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Get all medicines
+      tags:
+      - medicines
+  /api/medicine/v1/medicines/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve medicine details by ID
+      parameters:
+      - description: Medicine ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Medicine retrieved successfully
+          schema:
+            $ref: '#/definitions/dto.GetMedicineByIDResponseDto'
+        "400":
+          description: Invalid medicine ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Medicine not found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve medicine
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Get medicine by ID
+      tags:
+      - medicines
+  /api/order/v1/orders:
+    delete:
+      consumes:
+      - application/json
+      description: Cancel an existing order (doctor only - can only cancel their own
+        orders)
+      parameters:
+      - description: Order ID to cancel
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CancelOrderRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order cancelled successfully
+          schema:
+            $ref: '#/definitions/dto.CancelOrderResponseDto'
+        "400":
+          description: Invalid request body or order ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden - only doctors can cancel their own orders
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Order not found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to cancel order
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Cancel an order
+      tags:
+      - orders
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all orders for the authenticated patient from JWT token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Orders retrieved successfully
+          schema:
+            $ref: '#/definitions/dto.GetAllOrdersHistoryListDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve orders
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all orders history for the current patient
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: Create a new order in the system
+      parameters:
+      - description: Order creation data
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateOrderRequestDto'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Order created successfully
+          schema:
+            $ref: '#/definitions/dto.CreateOrderResponseDto'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden - only patients can create orders
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to create order
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new order
+      tags:
+      - orders
+    put:
+      consumes:
+      - application/json
+      description: Update an order (doctor only - can only edit their own orders).
+        Can add, edit, or remove order items.
+      parameters:
+      - description: Order update data
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateOrderRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order updated successfully
+          schema:
+            $ref: '#/definitions/dto.UpdateOrderResponseDto'
+        "400":
+          description: Invalid request body or order ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden - only doctors can update their own orders
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Order not found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to update order
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update an existing order
+      tags:
+      - orders
+  /api/order/v1/orders/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve order details including order items and medicine information
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order retrieved successfully
+          schema:
+            $ref: '#/definitions/dto.GetOrderByIDResponseDto'
+        "400":
+          description: Invalid order ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Order not found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve order
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get an order by ID
+      tags:
+      - orders
+  /api/order/v1/orders/confirm:
+    post:
+      consumes:
+      - application/json
+      description: Approve an existing order (doctor only - can only approve their
+        own orders). Sets order status to approved.
+      parameters:
+      - description: Order ID to approve
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ApproveOrderRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order approved successfully
+          schema:
+            $ref: '#/definitions/dto.ApproveOrderResponseDto'
+        "400":
+          description: Invalid request body or order ID
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden - only doctors can approve their own orders
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: Order not found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to approve order
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Approve an order
+      tags:
+      - orders
+  /api/order/v1/orders/latest:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the most recent order for the authenticated patient
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order retrieved successfully
+          schema:
+            $ref: '#/definitions/dto.GetOrderByIDResponseDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: No orders found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve order
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get latest order for the current patient
+      tags:
+      - orders
+  /api/order/v1/orders/latest/{patient_id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the most recent order for a specific patient. Only the
+        assigned doctor can access this endpoint.
+      parameters:
+      - description: Patient ID
+        in: path
+        name: patient_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order retrieved successfully
+          schema:
+            $ref: '#/definitions/dto.GetOrderByIDResponseDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "403":
+          description: Forbidden - doctor can only access their own patient's orders
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "404":
+          description: No orders found for this patient
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Failed to retrieve order
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get latest order for a specific patient (doctor only)
+      tags:
+      - orders
 schemes:
 - http
 securityDefinitions:
