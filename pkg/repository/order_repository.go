@@ -108,7 +108,7 @@ func (r *OrderRepository) FindByIDs(ctx context.Context, ids []uuid.UUID) ([]mod
 
 func (r *OrderRepository) FindByDoctorID(ctx context.Context, doctorID uuid.UUID) ([]models.Order, error) {
 	var orders []models.Order
-	if err := r.db.WithContext(ctx).Preload("OrderItems.Medicine").Where("doctor_id = ?", doctorID).Order("created_at DESC").Find(&orders).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("OrderItems.Medicine").Where("doctor_id = ? AND status = 'pending'", doctorID).Order("created_at DESC").Find(&orders).Error; err != nil {
 		return nil, err
 	}
 	return orders, nil

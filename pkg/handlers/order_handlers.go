@@ -253,6 +253,40 @@ func (h *OrderHandler) ApproveOrder(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(res)
 }
 
+// RejectOrder godoc
+// @Summary Reject an order
+// @Description Reject an existing order (doctor only - can only reject their own orders). Sets order status to rejected.
+// @Tags orders
+// @Accept  json
+// @Produce  json
+// @Param order body dto.RejectOrderRequestDto true "Order ID to reject"
+// @Success 200 {object} dto.RejectOrderResponseDto "Order rejected successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid request body or order ID"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 403 {object} response.ErrorResponse "Forbidden - only doctors can reject their own orders"
+// @Failure 404 {object} response.ErrorResponse "Order not found"
+// @Failure 500 {object} response.ErrorResponse "Failed to reject order"
+// @Router /api/order/v1/orders/reject [post]
+// @Security ApiKeyAuth
+func (h *OrderHandler) RejectOrder(c *fiber.Ctx) error {
+	var body dto.RejectOrderRequestDto
+	if err := c.BodyParser(&body); err != nil {
+		return response.BadRequest(c, "Invalid request body "+err.Error())
+	}
+
+	if body.OrderID == "" {
+		return response.BadRequest(c, "Order ID is required")
+	}
+
+	ctx := contextUtils.GetContext(c)
+	res, err := h.orderService.RejectOrder(ctx, body)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
 // GetAllOrdersForDoctor godoc
 // @Summary Get all orders for the current doctor
 // @Description Retrieve all orders created by the authenticated doctor with patient information
