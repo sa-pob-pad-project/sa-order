@@ -48,6 +48,23 @@ func NewOrderService(
 	}
 }
 
+// calculateOrderTotal calculates the total amount for an order based on its items
+func (s *OrderService) calculateOrderTotal(ctx context.Context, orderID uuid.UUID) (float64, error) {
+	orderItems, err := s.orderItemRepository.FindByOrderID(ctx, orderID)
+	if err != nil {
+		return 0, err
+	}
+
+	var totalAmount float64
+	for _, item := range orderItems {
+		if item.Medicine != nil {
+			totalAmount += item.Medicine.Price * item.Quantity
+		}
+	}
+
+	return totalAmount, nil
+}
+
 func (s *OrderService) CreateOrder(ctx context.Context, body dto.CreateOrderRequestDto) (*dto.CreateOrderResponseDto, error) {
 	userID := contextUtils.GetUserId(ctx)
 	role := contextUtils.GetRole(ctx)
@@ -120,6 +137,7 @@ func (s *OrderService) UpdateOrder(ctx context.Context, body dto.UpdateOrderRequ
 		return nil, apperr.New(apperr.CodeInternal, "failed to delete existing order items", err)
 	}
 	// add new order items
+	var totalAmount float64
 	for _, item := range body.OrderItems {
 		medicine, err := s.medicineRepository.FindByID(ctx, item.MedicineID)
 		if err != nil {
@@ -134,6 +152,14 @@ func (s *OrderService) UpdateOrder(ctx context.Context, body dto.UpdateOrderRequ
 		if err := s.orderItemRepository.Create(ctx, orderItem); err != nil {
 			return nil, apperr.New(apperr.CodeInternal, "failed to create order item", err)
 		}
+		// Calculate total amount
+		totalAmount += medicine.Price * item.Quantity
+	}
+
+	// Update order with calculated total amount
+	order.TotalAmount = totalAmount
+	if err := s.orderRepository.Update(ctx, order); err != nil {
+		return nil, apperr.New(apperr.CodeInternal, "failed to update order total amount", err)
 	}
 
 	return &dto.UpdateOrderResponseDto{
@@ -501,9 +527,16 @@ func (s *OrderService) ApproveOrder(ctx context.Context, body dto.ApproveOrderRe
 		return nil, apperr.New(apperr.CodeForbidden, "doctor can only approve their own orders", nil)
 	}
 
+	// Calculate total amount before approving
+	totalAmount, err := s.calculateOrderTotal(ctx, order.ID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeInternal, "failed to calculate order total", err)
+	}
+
 	order.Status = models.OrderStatusApproved
-	reverwedAt := time.Now()
-	order.ReviewedAt = &reverwedAt
+	order.TotalAmount = totalAmount
+	reviewedAt := time.Now()
+	order.ReviewedAt = &reviewedAt
 	if err := s.orderRepository.Update(ctx, order); err != nil {
 		return nil, apperr.New(apperr.CodeInternal, "failed to approve order", err)
 	}
@@ -541,7 +574,14 @@ func (s *OrderService) RejectOrder(ctx context.Context, body dto.RejectOrderRequ
 		return nil, apperr.New(apperr.CodeForbidden, "doctor can only reject their own orders", nil)
 	}
 
+	// Calculate total amount before rejecting
+	totalAmount, err := s.calculateOrderTotal(ctx, order.ID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeInternal, "failed to calculate order total", err)
+	}
+
 	order.Status = models.OrderStatusRejected
+	order.TotalAmount = totalAmount
 	reviewedAt := time.Now()
 	order.ReviewedAt = &reviewedAt
 	if err := s.orderRepository.Update(ctx, order); err != nil {

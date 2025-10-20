@@ -57,7 +57,7 @@ func (r *OrderItemRepository) FindByID(ctx context.Context, id uuid.UUID) (*mode
 
 func (r *OrderItemRepository) FindByOrderID(ctx context.Context, orderID uuid.UUID) ([]models.OrderItem, error) {
 	var items []models.OrderItem
-	if err := r.db.WithContext(ctx).Where("order_id = ?", orderID).Find(&items).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("Medicine").Where("order_id = ?", orderID).Find(&items).Error; err != nil {
 		return nil, err
 	}
 	return items, nil
