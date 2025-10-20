@@ -113,3 +113,19 @@ func (r *OrderRepository) FindByDoctorID(ctx context.Context, doctorID uuid.UUID
 	}
 	return orders, nil
 }
+
+func (r *OrderRepository) FindByDoctorIDAndStatus(ctx context.Context, doctorID uuid.UUID, status models.OrderStatus) ([]models.Order, error) {
+	var orders []models.Order
+	if err := r.db.WithContext(ctx).Preload("OrderItems.Medicine").Where("doctor_id = ? AND status = ?", doctorID, status).Order("created_at DESC").Find(&orders).Error; err != nil {
+		return nil, err
+	}
+	return orders, nil
+}
+
+func (r *OrderRepository) FindByDoctorIDAndStatuses(ctx context.Context, doctorID uuid.UUID, statuses []models.OrderStatus) ([]models.Order, error) {
+	var orders []models.Order
+	if err := r.db.WithContext(ctx).Preload("OrderItems.Medicine").Where("doctor_id = ? AND status IN ?", doctorID, statuses).Order("created_at DESC").Find(&orders).Error; err != nil {
+		return nil, err
+	}
+	return orders, nil
+}

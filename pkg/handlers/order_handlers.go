@@ -308,3 +308,28 @@ func (h *OrderHandler) GetAllOrdersForDoctor(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(res)
 }
+
+// GetAllOrdersHistoryForDoctor godoc
+// @Summary Get all approved or rejected orders for the current doctor
+// @Description Retrieve all approved or rejected orders created by the authenticated doctor with patient information. Can filter by specific status (approved or rejected)
+// @Tags orders
+// @Accept  json
+// @Produce  json
+// @Param status query string false "Filter by status: approved or rejected"
+// @Success 200 {object} dto.GetAllOrdersForDoctorListDto "Orders retrieved successfully"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 403 {object} response.ErrorResponse "Forbidden - only doctors can access this endpoint"
+// @Failure 500 {object} response.ErrorResponse "Failed to retrieve orders"
+// @Router /api/order/v1/orders/doctor/history [get]
+// @Security ApiKeyAuth
+func (h *OrderHandler) GetAllOrdersHistoryForDoctor(c *fiber.Ctx) error {
+	statusFilter := c.Query("status", "")
+
+	ctx := contextUtils.GetContext(c)
+	res, err := h.orderService.GetAllOrdersHistoryForDoctor(ctx, statusFilter)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}

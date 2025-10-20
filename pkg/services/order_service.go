@@ -502,11 +502,12 @@ func (s *OrderService) ApproveOrder(ctx context.Context, body dto.ApproveOrderRe
 	}
 
 	order.Status = models.OrderStatusApproved
+	reverwedAt := time.Now()
+	order.ReviewedAt = &reverwedAt
 	if err := s.orderRepository.Update(ctx, order); err != nil {
 		return nil, apperr.New(apperr.CodeInternal, "failed to approve order", err)
 	}
-	reverwedAt := time.Now()
-	order.ReviewedAt = &reverwedAt
+
 	return &dto.ApproveOrderResponseDto{
 		OrderID: order.ID.String(),
 		Status:  string(order.Status),
@@ -541,11 +542,11 @@ func (s *OrderService) RejectOrder(ctx context.Context, body dto.RejectOrderRequ
 	}
 
 	order.Status = models.OrderStatusRejected
+	reviewedAt := time.Now()
+	order.ReviewedAt = &reviewedAt
 	if err := s.orderRepository.Update(ctx, order); err != nil {
 		return nil, apperr.New(apperr.CodeInternal, "failed to reject order", err)
 	}
-	reviewedAt := time.Now()
-	order.ReviewedAt = &reviewedAt
 
 	return &dto.RejectOrderResponseDto{
 		OrderID: order.ID.String(),
@@ -569,6 +570,139 @@ func (s *OrderService) GetAllOrdersByDoctorID(ctx context.Context) (*dto.GetAllO
 	orders, err := s.orderRepository.FindByDoctorID(ctx, doctorID)
 	if err != nil {
 		return nil, apperr.New(apperr.CodeInternal, "failed to retrieve orders", err)
+	}
+
+	// Collect all unique patient IDs
+	patientIDMap := make(map[string]bool)
+	patientIDs := []string{}
+	for _, order := range orders {
+		patientID := order.PatientID.String()
+		if !patientIDMap[patientID] {
+			patientIDMap[patientID] = true
+			patientIDs = append(patientIDs, patientID)
+		}
+	}
+
+	// Fetch patient profiles from user client
+	patientProfiles := make(map[string]*dto.PatientInfo)
+	if len(patientIDs) > 0 {
+		profiles, err := s.userClient.GetPatientByIds(ctx, patientIDs)
+		if err == nil && profiles != nil {
+			for _, profile := range *profiles {
+				patientProfiles[profile.ID] = &dto.PatientInfo{
+					PatientID:   profile.ID,
+					FirstName:   profile.FirstName,
+					LastName:    profile.LastName,
+					Gender:      profile.Gender,
+					PhoneNumber: profile.PhoneNumber,
+				}
+			}
+		}
+	}
+
+	orderHistoryList := make([]dto.GetAllOrdersForDoctorResponseDto, len(orders))
+
+	for idx, order := range orders {
+		// Convert order items to response format
+		orderItems := make([]dto.OrderItem, len(order.OrderItems))
+		for i, item := range order.OrderItems {
+			medicineName := ""
+			if item.Medicine != nil {
+				medicineName = item.Medicine.Name
+			}
+			orderItems[i] = dto.OrderItem{
+				MedicineID:   item.MedicineID.String(),
+				MedicineName: medicineName,
+				Quantity:     item.Quantity,
+			}
+		}
+
+		// Format timestamps
+		var submittedAt, reviewedAt *string
+		if order.SubmittedAt != nil {
+			submittedAtStr := order.SubmittedAt.Format("2006-01-02T15:04:05Z07:00")
+			submittedAt = &submittedAtStr
+		}
+		if order.ReviewedAt != nil {
+			reviewedAtStr := order.ReviewedAt.Format("2006-01-02T15:04:05Z07:00")
+			reviewedAt = &reviewedAtStr
+		}
+
+		// Fetch delivery information if exists
+		var deliveryStatus, deliveryAt *string
+		delivery, err := s.deliveryRepository.FindByOrderID(ctx, order.ID)
+		if err == nil && delivery != nil {
+			status := string(delivery.Status)
+			deliveryStatus = &status
+			if delivery.DeliveredAt != nil {
+				deliveredAtStr := delivery.DeliveredAt.Format("2006-01-02T15:04:05Z07:00")
+				deliveryAt = &deliveredAtStr
+			}
+		}
+
+		var doctorIDStr *string
+		if order.DoctorID != nil {
+			doctorIDStrVal := order.DoctorID.String()
+			doctorIDStr = &doctorIDStrVal
+		}
+
+		// Get patient info from the map
+		patientInfo := patientProfiles[order.PatientID.String()]
+
+		orderHistoryList[idx] = dto.GetAllOrdersForDoctorResponseDto{
+			OrderID:        order.ID.String(),
+			PatientID:      order.PatientID.String(),
+			PatientInfo:    patientInfo,
+			DoctorID:       doctorIDStr,
+			TotalAmount:    order.TotalAmount,
+			Note:           order.Note,
+			SubmittedAt:    submittedAt,
+			ReviewedAt:     reviewedAt,
+			Status:         string(order.Status),
+			DeliveryStatus: deliveryStatus,
+			DeliveryAt:     deliveryAt,
+			CreatedAt:      order.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			UpdatedAt:      order.UpdatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			OrderItems:     orderItems,
+		}
+	}
+
+	return &dto.GetAllOrdersForDoctorListDto{
+		Orders: orderHistoryList,
+		Total:  len(orderHistoryList),
+	}, nil
+}
+
+func (s *OrderService) GetAllOrdersHistoryForDoctor(ctx context.Context, statusFilter string) (*dto.GetAllOrdersForDoctorListDto, error) {
+	userID := contextUtils.GetUserId(ctx)
+	role := contextUtils.GetRole(ctx)
+
+	if role != "doctor" {
+		return nil, apperr.New(apperr.CodeForbidden, "only doctors can access this endpoint", nil)
+	}
+
+	doctorID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid user ID", err)
+	}
+
+	var orders []models.Order
+
+	// Filter by status if provided (approved or rejected)
+	if statusFilter != "" {
+		status := models.OrderStatus(statusFilter)
+		orders, err = s.orderRepository.FindByDoctorIDAndStatus(ctx, doctorID, status)
+		if err != nil {
+			return nil, apperr.New(apperr.CodeInternal, "failed to retrieve orders", err)
+		}
+	} else {
+		// If no filter, get all non-pending orders (approved or rejected)
+		allOrders, err := s.orderRepository.FindByDoctorIDAndStatuses(ctx, doctorID, []models.OrderStatus{models.OrderStatusApproved, models.OrderStatusRejected})
+		if err != nil {
+			return nil, apperr.New(apperr.CodeInternal, "failed to retrieve orders", err)
+		}
+
+		orders = allOrders
 	}
 
 	// Collect all unique patient IDs
