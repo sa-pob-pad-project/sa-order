@@ -288,6 +288,21 @@ func (h *OrderHandler) RejectOrder(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(res)
 }
 
+// PayOrder godoc
+// @Summary Mark an order as paid
+// @Description Marks an order as paid and updates its payment status. Only the patient who created the order can pay it.
+// @Tags orders
+// @Accept json
+// @Produce json
+// @Param request body dto.PayOrderRequestDto true "Pay order request data"
+// @Success 200 {object} response.SuccessResponse "Order payment recorded successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid request body or missing order ID"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized - authentication token missing or invalid"
+// @Failure 403 {object} response.ErrorResponse "Forbidden - only the patient can pay their own orders"
+// @Failure 404 {object} response.ErrorResponse "Order not found"
+// @Failure 500 {object} response.ErrorResponse "Internal server error while processing payment"
+// @Router /api/order/v1/orders/pay [post]
+// @Security ApiKeyAuth
 func (h OrderHandler) PayOrder(c *fiber.Ctx) error {
 	var body dto.PayOrderRequestDto
 	if err := c.BodyParser(&body); err != nil {
@@ -306,22 +321,6 @@ func (h OrderHandler) PayOrder(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(res)
 }
-
-// PayOrder godoc
-// @Summary Mark an order as paid
-// @Description Marks an order as paid and updates its payment status. Only the patient who created the order can pay it.
-// @Tags orders
-// @Accept json
-// @Produce json
-// @Param request body dto.PayOrderRequestDto true "Pay order request data"
-// @Success 200 {object} response.SuccessResponse "Order payment recorded successfully"
-// @Failure 400 {object} response.ErrorResponse "Invalid request body or missing order ID"
-// @Failure 401 {object} response.ErrorResponse "Unauthorized - authentication token missing or invalid"
-// @Failure 403 {object} response.ErrorResponse "Forbidden - only the patient can pay their own orders"
-// @Failure 404 {object} response.ErrorResponse "Order not found"
-// @Failure 500 {object} response.ErrorResponse "Internal server error while processing payment"
-// @Router /api/order/v1/orders/pay [post]
-// @Security ApiKeyAuth
 
 // GetAllOrdersForDoctor godoc
 // @Summary Get all orders for the current doctor
