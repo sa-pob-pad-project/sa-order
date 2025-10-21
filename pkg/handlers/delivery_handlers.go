@@ -82,7 +82,7 @@ func (h *DeliveryInfoHandler) GetDeliveryInfo(c *fiber.Ctx) error {
 // @Tags delivery-info
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} dto.GetAllDeliveryInfosResponseDto "Delivery information retrieved successfully"
+// @Success 200 {object} dto.GetDeliveryInfoResponseDto "Delivery information retrieved successfully"
 // @Failure 401 {object} response.ErrorResponse "Unauthorized"
 // @Failure 500 {object} response.ErrorResponse "Failed to retrieve delivery information"
 // @Router /api/delivery-info/v1 [get]
@@ -148,6 +148,34 @@ func (h *DeliveryInfoHandler) DeleteDeliveryInfo(c *fiber.Ctx) error {
 
 	ctx := contextUtils.GetContext(c)
 	res, err := h.deliveryService.DeleteDeliveryInfo(ctx, body.ID)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
+// GetDeliveryInfosByMethod godoc
+// @Summary Get delivery information by method
+// @Description Retrieve delivery information records filtered by delivery method
+// @Tags delivery-info
+// @Accept  json
+// @Produce  json
+// @Param method query string true "Delivery method (flash or pick_up)"
+// @Success 200 {object} dto.GetAllDeliveryInfosResponseDto "Delivery information retrieved successfully"
+// @Failure 400 {object} response.ErrorResponse "Invalid request"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Failed to retrieve delivery information"
+// @Router /api/delivery-info/v1/methods [get]
+// @Security ApiKeyAuth
+func (h *DeliveryInfoHandler) GetDeliveryInfosByMethod(c *fiber.Ctx) error {
+	method := c.Query("method")
+	if method == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Query parameter 'method' is required"})
+	}
+
+	ctx := contextUtils.GetContext(c)
+	res, err := h.deliveryService.GetDeliveryInfosByMethod(ctx, method)
 	if err != nil {
 		return apperr.WriteError(c, err)
 	}

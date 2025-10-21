@@ -52,6 +52,7 @@ func SetupRoutes(app *fiber.App, orderHandler *handlers.OrderHandler, medicineHa
 	deliveryInfoV1.Post("/", deliveryInfoHandler.CreateDeliveryInfo)
 	deliveryInfoV1.Put("/", deliveryInfoHandler.UpdateDeliveryInfo)
 	deliveryInfoV1.Delete("/", deliveryInfoHandler.DeleteDeliveryInfo)
-	deliveryInfoV1.Get("/", deliveryInfoHandler.GetAllDeliveryInfos)
+	deliveryInfoV1.Get("/methods", deliveryInfoHandler.GetDeliveryInfosByMethod)
 	deliveryInfoV1.Get("/:id", deliveryInfoHandler.GetDeliveryInfo) // delivery id
+	deliveryInfoV1.Get("/", deliveryInfoHandler.GetAllDeliveryInfos)
 }

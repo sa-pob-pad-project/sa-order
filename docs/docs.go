@@ -37,7 +37,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Delivery information retrieved successfully",
                         "schema": {
-                            "$ref": "#/definitions/dto.GetAllDeliveryInfosResponseDto"
+                            "$ref": "#/definitions/dto.GetDeliveryInfoResponseDto"
                         }
                     },
                     "401": {
@@ -225,6 +225,61 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to delete delivery information",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/delivery-info/v1/methods": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve delivery information records filtered by delivery method",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "delivery-info"
+                ],
+                "summary": "Get delivery information by method",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Delivery method (flash or pick_up)",
+                        "name": "method",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delivery information retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetAllDeliveryInfosResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve delivery information",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -676,6 +731,106 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/order/v1/orders/doctor": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve all orders created by the authenticated doctor with patient information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get all orders for the current doctor",
+                "responses": {
+                    "200": {
+                        "description": "Orders retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetAllOrdersForDoctorListDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - only doctors can access this endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve orders",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/v1/orders/doctor/history": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Retrieve all approved or rejected orders created by the authenticated doctor with patient information. Can filter by specific status (approved or rejected)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get all approved or rejected orders for the current doctor",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by status: approved or rejected",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Orders retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.GetAllOrdersForDoctorListDto"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - only doctors can access this endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to retrieve orders",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/order/v1/orders/latest": {
             "get": {
                 "security": [
@@ -776,6 +931,75 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Failed to retrieve order",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/v1/orders/reject": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Reject an existing order (doctor only - can only reject their own orders). Sets order status to rejected.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Reject an order",
+                "parameters": [
+                    {
+                        "description": "Order ID to reject",
+                        "name": "order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RejectOrderRequestDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order rejected successfully",
+                        "schema": {
+                            "$ref": "#/definitions/dto.RejectOrderResponseDto"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or order ID",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - only doctors can reject their own orders",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to reject order",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -1008,6 +1232,70 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.GetAllOrdersForDoctorListDto": {
+            "type": "object",
+            "properties": {
+                "orders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.GetAllOrdersForDoctorResponseDto"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.GetAllOrdersForDoctorResponseDto": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "delivery_at": {
+                    "type": "string"
+                },
+                "delivery_status": {
+                    "type": "string"
+                },
+                "doctor_id": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "order_items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.OrderItem"
+                    }
+                },
+                "patient_id": {
+                    "type": "string"
+                },
+                "patient_info": {
+                    "$ref": "#/definitions/dto.PatientInfo"
+                },
+                "reviewed_at": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "submitted_at": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.GetAllOrdersHistoryListDto": {
             "type": "object",
             "properties": {
@@ -1174,6 +1462,45 @@ const docTemplate = `{
                 },
                 "quantity": {
                     "type": "number"
+                }
+            }
+        },
+        "dto.PatientInfo": {
+            "type": "object",
+            "properties": {
+                "first_name": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "patient_id": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RejectOrderRequestDto": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RejectOrderResponseDto": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },

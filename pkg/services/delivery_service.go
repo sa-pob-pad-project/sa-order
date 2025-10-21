@@ -3,12 +3,15 @@ package service
 import (
 	"context"
 	"errors"
+	"strings"
+	"time"
+
 	"order-service/pkg/apperr"
 	"order-service/pkg/clients"
 	contextUtils "order-service/pkg/context"
 	"order-service/pkg/dto"
+	"order-service/pkg/models"
 	"order-service/pkg/repository"
-	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -146,5 +149,37 @@ func (s *DeliveryService) DeleteDeliveryInfo(ctx context.Context, id string) (*d
 	return &dto.DeleteDeliveryInfoResponseDto{
 		ID:        id,
 		DeletedAt: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+// GetDeliveryInfosByMethod retrieves the latest delivery information record for the authenticated user filtered by delivery method
+func (s *DeliveryService) GetDeliveryInfosByMethod(ctx context.Context, method string) (*dto.GetDeliveryInfoResponseDto, error) {
+	if method == "" {
+		return nil, apperr.New(apperr.CodeBadRequest, "Delivery method is required", nil)
+	}
+
+	userID := contextUtils.GetUserId(ctx)
+	userUUID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "Invalid user ID format", err)
+	}
+
+	methodEnum := models.DeliveryMethodEnum(strings.ToLower(method))
+	switch methodEnum {
+	case models.DeliveryMethodFlash, models.DeliveryMethodPickUp:
+	default:
+		return nil, apperr.New(apperr.CodeBadRequest, "Invalid delivery method", nil)
+	}
+
+	info, err := s.deliveryInfoRepository.FindLatestByUserIDAndDeliveryMethod(ctx, userUUID, methodEnum)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperr.New(apperr.CodeNotFound, "Delivery information not found", err)
+		}
+		return nil, apperr.New(apperr.CodeInternal, "Failed to retrieve delivery information", err)
+	}
+
+	return &dto.GetDeliveryInfoResponseDto{
+		DeliveryInfo: dto.ToDeliveryInfoDto(info),
 	}, nil
 }
