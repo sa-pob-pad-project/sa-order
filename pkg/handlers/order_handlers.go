@@ -287,6 +287,25 @@ func (h *OrderHandler) RejectOrder(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(res)
 }
 
+func (h OrderHandler) PayOrder(c *fiber.Ctx) error {
+	var body dto.PayOrderRequestDto
+	if err := c.BodyParser(&body); err != nil {
+		return response.BadRequest(c, "Invalid request body "+err.Error())
+	}
+
+	if body.OrderID == "" {
+		return response.BadRequest(c, "Order ID is required")
+	}
+
+	ctx := contextUtils.GetContext(c)
+	res, err := h.orderService.PayOrder(ctx, body)
+	if err != nil {
+		return apperr.WriteError(c, err)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
 // GetAllOrdersForDoctor godoc
 // @Summary Get all orders for the current doctor
 // @Description Retrieve all orders created by the authenticated doctor with patient information

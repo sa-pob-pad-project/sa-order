@@ -594,6 +594,69 @@ func (s *OrderService) RejectOrder(ctx context.Context, body dto.RejectOrderRequ
 	}, nil
 }
 
+func (s *OrderService) PayOrder(ctx context.Context, body dto.PayOrderRequestDto) (*dto.PayOrderResponseDto, error) {
+	userID := contextUtils.GetUserId(ctx)
+	role := contextUtils.GetRole(ctx)
+
+	// อนุญาตเฉพาะคนไข้/ผู้สั่งซื้อ (ปรับตามระบบคุณ: "patient", "user" หรือ role อื่น)
+	if role != "patient" {
+		return nil, apperr.New(apperr.CodeForbidden, "only patients can pay orders", nil)
+	}
+
+	// validate body
+	if body.OrderID == "" {
+		return nil, apperr.New(apperr.CodeBadRequest, "order ID is required", nil)
+	}
+	parsedOrderID, err := uuid.Parse(body.OrderID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid order ID", err)
+	}
+
+	// โหลดออเดอร์
+	order, err := s.orderRepository.FindByID(ctx, parsedOrderID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeNotFound, "order not found", err)
+	}
+
+	patientID, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeBadRequest, "invalid user ID", err)
+	}
+	if order.PatientID != patientID {
+		return nil, apperr.New(apperr.CodeForbidden, "patient can only pay their own orders", nil)
+	}
+
+	// ตรวจสถานะที่อนุญาตให้จ่ายเงิน
+	switch order.Status {
+	case models.OrderStatusPaid, models.OrderStatusProcessing, models.OrderStatusShipped, models.OrderStatusDelivered:
+		return nil, apperr.New(apperr.CodeConflict, "order already paid or processed", nil)
+	case models.OrderStatusCancelled, models.OrderStatusRejected:
+		return nil, apperr.New(apperr.CodeForbidden, "order cannot be paid in current state", nil)
+	case models.OrderStatusPending, models.OrderStatusApproved:
+		// allowed
+	default:
+		return nil, apperr.New(apperr.CodeBadRequest, "unknown order state", nil)
+	}
+
+	// คำนวณยอดรวมล่าสุด (กันกรณีมีส่วนลด/ราคาเปลี่ยน)
+	totalAmount, err := s.calculateOrderTotal(ctx, order.ID)
+	if err != nil {
+		return nil, apperr.New(apperr.CodeInternal, "failed to calculate order total", err)
+	}
+
+	order.Status = models.OrderStatusPaid
+	order.TotalAmount = totalAmount
+
+	if err := s.orderRepository.Update(ctx, order); err != nil {
+		return nil, apperr.New(apperr.CodeInternal, "failed to mark order paid", err)
+	}
+
+	return &dto.PayOrderResponseDto{
+		OrderID: order.ID.String(),
+		Status:  string(order.Status),
+	}, nil
+}
+
 func (s *OrderService) GetAllOrdersByDoctorID(ctx context.Context) (*dto.GetAllOrdersForDoctorListDto, error) {
 	userID := contextUtils.GetUserId(ctx)
 	role := contextUtils.GetRole(ctx)
