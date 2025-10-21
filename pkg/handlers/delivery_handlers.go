@@ -20,16 +20,16 @@ func NewDeliveryInfoHandler(deliveryService *service.DeliveryService) *DeliveryI
 }
 
 // CreateDeliveryInfo godoc
-// @Summary Create a new delivery information
-// @Description Create a new delivery information record
+// @Summary Create new delivery information
+// @Description Creates a new delivery information record for an order. Contains details about the delivery method and address.
 // @Tags delivery-info
-// @Accept  json
-// @Produce  json
-// @Param delivery_info body dto.CreateDeliveryInfoRequestDto true "Delivery Information Data"
+// @Accept json
+// @Produce json
+// @Param request body dto.CreateDeliveryInfoRequestDto true "Delivery information request data"
 // @Success 201 {object} dto.CreateDeliveryInfoResponseDto "Delivery information created successfully"
-// @Failure 400 {object} response.ErrorResponse "Invalid request body"
-// @Failure 401 {object} response.ErrorResponse "Unauthorized"
-// @Failure 500 {object} response.ErrorResponse "Failed to create delivery information"
+// @Failure 400 {object} response.ErrorResponse "Invalid request body or missing required fields"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized - authentication token missing or invalid"
+// @Failure 500 {object} response.ErrorResponse "Internal server error while creating delivery information"
 // @Router /api/delivery-info/v1 [post]
 // @Security ApiKeyAuth
 func (h *DeliveryInfoHandler) CreateDeliveryInfo(c *fiber.Ctx) error {
@@ -49,16 +49,16 @@ func (h *DeliveryInfoHandler) CreateDeliveryInfo(c *fiber.Ctx) error {
 
 // GetDeliveryInfo godoc
 // @Summary Get delivery information by ID
-// @Description Retrieve delivery information details by ID
+// @Description Retrieves detailed information about a specific delivery record identified by its ID.
 // @Tags delivery-info
-// @Accept  json
-// @Produce  json
-// @Param id path string true "Delivery Information ID"
+// @Accept json
+// @Produce json
+// @Param id path string true "Delivery Information ID (UUID)"
 // @Success 200 {object} dto.GetDeliveryInfoResponseDto "Delivery information retrieved successfully"
-// @Failure 400 {object} response.ErrorResponse "Invalid delivery information ID"
-// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 400 {object} response.ErrorResponse "Invalid or missing delivery information ID"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized - authentication token missing or invalid"
 // @Failure 404 {object} response.ErrorResponse "Delivery information not found"
-// @Failure 500 {object} response.ErrorResponse "Failed to retrieve delivery information"
+// @Failure 500 {object} response.ErrorResponse "Internal server error while retrieving delivery information"
 // @Router /api/delivery-info/v1/{id} [get]
 // @Security ApiKeyAuth
 func (h *DeliveryInfoHandler) GetDeliveryInfo(c *fiber.Ctx) error {
@@ -77,14 +77,14 @@ func (h *DeliveryInfoHandler) GetDeliveryInfo(c *fiber.Ctx) error {
 }
 
 // GetAllDeliveryInfos godoc
-// @Summary Get all delivery information
-// @Description Retrieve all delivery information records
+// @Summary Get all delivery information records
+// @Description Retrieves all delivery information records from the system.
 // @Tags delivery-info
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Success 200 {object} dto.GetDeliveryInfoResponseDto "Delivery information retrieved successfully"
-// @Failure 401 {object} response.ErrorResponse "Unauthorized"
-// @Failure 500 {object} response.ErrorResponse "Failed to retrieve delivery information"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized - authentication token missing or invalid"
+// @Failure 500 {object} response.ErrorResponse "Internal server error while retrieving delivery information"
 // @Router /api/delivery-info/v1 [get]
 // @Security ApiKeyAuth
 func (h *DeliveryInfoHandler) GetAllDeliveryInfos(c *fiber.Ctx) error {
@@ -99,16 +99,16 @@ func (h *DeliveryInfoHandler) GetAllDeliveryInfos(c *fiber.Ctx) error {
 
 // UpdateDeliveryInfo godoc
 // @Summary Update delivery information
-// @Description Update an existing delivery information record
+// @Description Updates an existing delivery information record with new data.
 // @Tags delivery-info
-// @Accept  json
-// @Produce  json
-// @Param delivery_info body dto.UpdateDeliveryInfoRequestDto true "Updated Delivery Information Data"
+// @Accept json
+// @Produce json
+// @Param request body dto.UpdateDeliveryInfoRequestDto true "Updated delivery information request data"
 // @Success 200 {object} dto.UpdateDeliveryInfoResponseDto "Delivery information updated successfully"
-// @Failure 400 {object} response.ErrorResponse "Invalid request body or delivery information ID"
-// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 400 {object} response.ErrorResponse "Invalid request body or missing delivery information ID"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized - authentication token missing or invalid"
 // @Failure 404 {object} response.ErrorResponse "Delivery information not found"
-// @Failure 500 {object} response.ErrorResponse "Failed to update delivery information"
+// @Failure 500 {object} response.ErrorResponse "Internal server error while updating delivery information"
 // @Router /api/delivery-info/v1 [put]
 // @Security ApiKeyAuth
 func (h *DeliveryInfoHandler) UpdateDeliveryInfo(c *fiber.Ctx) error {
@@ -128,16 +128,16 @@ func (h *DeliveryInfoHandler) UpdateDeliveryInfo(c *fiber.Ctx) error {
 
 // DeleteDeliveryInfo godoc
 // @Summary Delete delivery information
-// @Description Delete an existing delivery information record
+// @Description Deletes an existing delivery information record.
 // @Tags delivery-info
-// @Accept  json
-// @Produce  json
-// @Param delivery_info body dto.DeleteDeliveryInfoRequestDto true "Delivery Information ID to delete"
+// @Accept json
+// @Produce json
+// @Param request body dto.DeleteDeliveryInfoRequestDto true "Delivery information ID to delete"
 // @Success 200 {object} dto.DeleteDeliveryInfoResponseDto "Delivery information deleted successfully"
-// @Failure 400 {object} response.ErrorResponse "Invalid delivery information ID"
-// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 400 {object} response.ErrorResponse "Invalid or missing delivery information ID"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized - authentication token missing or invalid"
 // @Failure 404 {object} response.ErrorResponse "Delivery information not found"
-// @Failure 500 {object} response.ErrorResponse "Failed to delete delivery information"
+// @Failure 500 {object} response.ErrorResponse "Internal server error while deleting delivery information"
 // @Router /api/delivery-info/v1 [delete]
 // @Security ApiKeyAuth
 func (h *DeliveryInfoHandler) DeleteDeliveryInfo(c *fiber.Ctx) error {
@@ -156,16 +156,16 @@ func (h *DeliveryInfoHandler) DeleteDeliveryInfo(c *fiber.Ctx) error {
 }
 
 // GetDeliveryInfosByMethod godoc
-// @Summary Get delivery information by method
-// @Description Retrieve delivery information records filtered by delivery method
+// @Summary Get delivery information by delivery method
+// @Description Retrieves all delivery information records filtered by the specified delivery method (e.g., 'flash' for express delivery or 'pick_up' for customer pickup).
 // @Tags delivery-info
-// @Accept  json
-// @Produce  json
-// @Param method query string true "Delivery method (flash or pick_up)"
+// @Accept json
+// @Produce json
+// @Param method query string true "Delivery method filter: 'flash' (express delivery) or 'pick_up' (customer pickup)"
 // @Success 200 {object} dto.GetAllDeliveryInfosResponseDto "Delivery information retrieved successfully"
-// @Failure 400 {object} response.ErrorResponse "Invalid request"
-// @Failure 401 {object} response.ErrorResponse "Unauthorized"
-// @Failure 500 {object} response.ErrorResponse "Failed to retrieve delivery information"
+// @Failure 400 {object} response.ErrorResponse "Missing or invalid delivery method query parameter"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized - authentication token missing or invalid"
+// @Failure 500 {object} response.ErrorResponse "Internal server error while retrieving delivery information"
 // @Router /api/delivery-info/v1/methods [get]
 // @Security ApiKeyAuth
 func (h *DeliveryInfoHandler) GetDeliveryInfosByMethod(c *fiber.Ctx) error {

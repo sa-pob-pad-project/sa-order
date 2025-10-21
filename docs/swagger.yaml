@@ -343,11 +343,11 @@ paths:
     delete:
       consumes:
       - application/json
-      description: Delete an existing delivery information record
+      description: Deletes an existing delivery information record.
       parameters:
-      - description: Delivery Information ID to delete
+      - description: Delivery information ID to delete
         in: body
-        name: delivery_info
+        name: request
         required: true
         schema:
           $ref: '#/definitions/dto.DeleteDeliveryInfoRequestDto'
@@ -359,11 +359,11 @@ paths:
           schema:
             $ref: '#/definitions/dto.DeleteDeliveryInfoResponseDto'
         "400":
-          description: Invalid delivery information ID
+          description: Invalid or missing delivery information ID
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "404":
@@ -371,7 +371,7 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to delete delivery information
+          description: Internal server error while deleting delivery information
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
@@ -382,7 +382,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieve all delivery information records
+      description: Retrieves all delivery information records from the system.
       produces:
       - application/json
       responses:
@@ -391,26 +391,27 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetDeliveryInfoResponseDto'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to retrieve delivery information
+          description: Internal server error while retrieving delivery information
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get all delivery information
+      summary: Get all delivery information records
       tags:
       - delivery-info
     post:
       consumes:
       - application/json
-      description: Create a new delivery information record
+      description: Creates a new delivery information record for an order. Contains
+        details about the delivery method and address.
       parameters:
-      - description: Delivery Information Data
+      - description: Delivery information request data
         in: body
-        name: delivery_info
+        name: request
         required: true
         schema:
           $ref: '#/definitions/dto.CreateDeliveryInfoRequestDto'
@@ -422,30 +423,30 @@ paths:
           schema:
             $ref: '#/definitions/dto.CreateDeliveryInfoResponseDto'
         "400":
-          description: Invalid request body
+          description: Invalid request body or missing required fields
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to create delivery information
+          description: Internal server error while creating delivery information
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Create a new delivery information
+      summary: Create new delivery information
       tags:
       - delivery-info
     put:
       consumes:
       - application/json
-      description: Update an existing delivery information record
+      description: Updates an existing delivery information record with new data.
       parameters:
-      - description: Updated Delivery Information Data
+      - description: Updated delivery information request data
         in: body
-        name: delivery_info
+        name: request
         required: true
         schema:
           $ref: '#/definitions/dto.UpdateDeliveryInfoRequestDto'
@@ -457,11 +458,11 @@ paths:
           schema:
             $ref: '#/definitions/dto.UpdateDeliveryInfoResponseDto'
         "400":
-          description: Invalid request body or delivery information ID
+          description: Invalid request body or missing delivery information ID
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "404":
@@ -469,7 +470,7 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to update delivery information
+          description: Internal server error while updating delivery information
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
@@ -481,9 +482,10 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieve delivery information details by ID
+      description: Retrieves detailed information about a specific delivery record
+        identified by its ID.
       parameters:
-      - description: Delivery Information ID
+      - description: Delivery Information ID (UUID)
         in: path
         name: id
         required: true
@@ -496,11 +498,11 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetDeliveryInfoResponseDto'
         "400":
-          description: Invalid delivery information ID
+          description: Invalid or missing delivery information ID
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "404":
@@ -508,7 +510,7 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to retrieve delivery information
+          description: Internal server error while retrieving delivery information
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
@@ -520,9 +522,12 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieve delivery information records filtered by delivery method
+      description: Retrieves all delivery information records filtered by the specified
+        delivery method (e.g., 'flash' for express delivery or 'pick_up' for customer
+        pickup).
       parameters:
-      - description: Delivery method (flash or pick_up)
+      - description: 'Delivery method filter: ''flash'' (express delivery) or ''pick_up''
+          (customer pickup)'
         in: query
         name: method
         required: true
@@ -535,27 +540,28 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetAllDeliveryInfosResponseDto'
         "400":
-          description: Invalid request
+          description: Missing or invalid delivery method query parameter
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to retrieve delivery information
+          description: Internal server error while retrieving delivery information
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get delivery information by method
+      summary: Get delivery information by delivery method
       tags:
       - delivery-info
   /api/medicine/v1/medicines:
     get:
       consumes:
       - application/json
-      description: Retrieve all available medicines from the system
+      description: Retrieves a list of all available medicines in the system. This
+        endpoint does not require authentication.
       produces:
       - application/json
       responses:
@@ -564,19 +570,20 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetAllMedicinesResponseDto'
         "500":
-          description: Failed to retrieve medicines
+          description: Internal server error while retrieving medicines
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-      summary: Get all medicines
+      summary: Get all available medicines
       tags:
       - medicines
   /api/medicine/v1/medicines/{id}:
     get:
       consumes:
       - application/json
-      description: Retrieve medicine details by ID
+      description: Retrieves detailed information about a specific medicine identified
+        by its ID. This endpoint does not require authentication.
       parameters:
-      - description: Medicine ID
+      - description: Medicine ID (UUID)
         in: path
         name: id
         required: true
@@ -589,7 +596,7 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetMedicineByIDResponseDto'
         "400":
-          description: Invalid medicine ID
+          description: Invalid or missing medicine ID
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "404":
@@ -597,22 +604,22 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to retrieve medicine
+          description: Internal server error while retrieving medicine
           schema:
             $ref: '#/definitions/response.ErrorResponse'
-      summary: Get medicine by ID
+      summary: Get medicine details by ID
       tags:
       - medicines
   /api/order/v1/orders:
     delete:
       consumes:
       - application/json
-      description: Cancel an existing order (doctor only - can only cancel their own
-        orders)
+      description: Cancels an order (doctor only). Only the doctor who created the
+        order can cancel it. The order status will be changed to cancelled.
       parameters:
-      - description: Order ID to cancel
+      - description: Cancel order request data
         in: body
-        name: order
+        name: request
         required: true
         schema:
           $ref: '#/definitions/dto.CancelOrderRequestDto'
@@ -624,15 +631,16 @@ paths:
           schema:
             $ref: '#/definitions/dto.CancelOrderResponseDto'
         "400":
-          description: Invalid request body or order ID
+          description: Invalid request body or missing order ID
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "403":
-          description: Forbidden - only doctors can cancel their own orders
+          description: Forbidden - only the doctor who created this order can cancel
+            it
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "404":
@@ -640,18 +648,19 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to cancel order
+          description: Internal server error while cancelling order
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Cancel an order
+      summary: Cancel an existing order
       tags:
       - orders
     get:
       consumes:
       - application/json
-      description: Retrieve all orders for the authenticated patient from JWT token
+      description: Retrieves the complete order history for the authenticated patient.
+        The patient is identified from the JWT authentication token.
       produces:
       - application/json
       responses:
@@ -660,26 +669,27 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetAllOrdersHistoryListDto'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to retrieve orders
+          description: Internal server error while retrieving orders
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get all orders history for the current patient
+      summary: Get all orders for the current patient
       tags:
       - orders
     post:
       consumes:
       - application/json
-      description: Create a new order in the system
+      description: Creates a new order in the system. Only patients can create orders.
+        The order will be assigned to the authenticated patient's doctor.
       parameters:
-      - description: Order creation data
+      - description: Order creation request data
         in: body
-        name: order
+        name: request
         required: true
         schema:
           $ref: '#/definitions/dto.CreateOrderRequestDto'
@@ -691,11 +701,11 @@ paths:
           schema:
             $ref: '#/definitions/dto.CreateOrderResponseDto'
         "400":
-          description: Invalid request body
+          description: Invalid request body or missing required fields
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "403":
@@ -703,7 +713,7 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to create order
+          description: Internal server error while creating order
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
@@ -714,12 +724,13 @@ paths:
     put:
       consumes:
       - application/json
-      description: Update an order (doctor only - can only edit their own orders).
-        Can add, edit, or remove order items.
+      description: Updates an order with new items or modifications. Only doctors
+        can update orders they created. Supports adding, editing, or removing order
+        items.
       parameters:
-      - description: Order update data
+      - description: Order update request data
         in: body
-        name: order
+        name: request
         required: true
         schema:
           $ref: '#/definitions/dto.UpdateOrderRequestDto'
@@ -731,15 +742,16 @@ paths:
           schema:
             $ref: '#/definitions/dto.UpdateOrderResponseDto'
         "400":
-          description: Invalid request body or order ID
+          description: Invalid request body or malformed order ID
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "403":
-          description: Forbidden - only doctors can update their own orders
+          description: Forbidden - only the doctor who created this order can update
+            it
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "404":
@@ -747,7 +759,7 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to update order
+          description: Internal server error while updating order
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
@@ -759,9 +771,10 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieve order details including order items and medicine information
+      description: Retrieves detailed information about a specific order including
+        all order items and associated medicine information.
       parameters:
-      - description: Order ID
+      - description: Order ID (UUID)
         in: path
         name: id
         required: true
@@ -774,11 +787,11 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetOrderByIDResponseDto'
         "400":
-          description: Invalid order ID
+          description: Invalid or missing order ID
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "404":
@@ -786,7 +799,7 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to retrieve order
+          description: Internal server error while retrieving order
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
@@ -798,12 +811,12 @@ paths:
     post:
       consumes:
       - application/json
-      description: Approve an existing order (doctor only - can only approve their
-        own orders). Sets order status to approved.
+      description: Approves an order and sets its status to approved (doctor only).
+        Only the doctor who created the order can approve it.
       parameters:
-      - description: Order ID to approve
+      - description: Approve order request data
         in: body
-        name: order
+        name: request
         required: true
         schema:
           $ref: '#/definitions/dto.ApproveOrderRequestDto'
@@ -815,15 +828,16 @@ paths:
           schema:
             $ref: '#/definitions/dto.ApproveOrderResponseDto'
         "400":
-          description: Invalid request body or order ID
+          description: Invalid request body or missing order ID
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "403":
-          description: Forbidden - only doctors can approve their own orders
+          description: Forbidden - only the doctor who created this order can approve
+            it
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "404":
@@ -831,20 +845,21 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to approve order
+          description: Internal server error while approving order
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Approve an order
+      summary: Approve an existing order
       tags:
       - orders
   /api/order/v1/orders/doctor:
     get:
       consumes:
       - application/json
-      description: Retrieve all orders created by the authenticated doctor with patient
-        information
+      description: Retrieves all orders created by the authenticated doctor. Includes
+        patient information for each order. The doctor is identified from the JWT
+        authentication token.
       produces:
       - application/json
       responses:
@@ -853,7 +868,7 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetAllOrdersForDoctorListDto'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "403":
@@ -861,7 +876,7 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to retrieve orders
+          description: Internal server error while retrieving orders
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
@@ -873,11 +888,13 @@ paths:
     get:
       consumes:
       - application/json
-      description: Retrieve all approved or rejected orders created by the authenticated
-        doctor with patient information. Can filter by specific status (approved or
-        rejected)
+      description: Retrieves approved or rejected orders created by the authenticated
+        doctor. Includes patient information for each order. Can filter by status
+        using the optional query parameter. Valid status values are "approved" or
+        "rejected".
       parameters:
-      - description: 'Filter by status: approved or rejected'
+      - description: 'Filter by status: ''approved'' or ''rejected''. If omitted,
+          returns all approved and rejected orders.'
         in: query
         name: status
         type: string
@@ -889,7 +906,7 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetAllOrdersForDoctorListDto'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "403":
@@ -897,19 +914,20 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to retrieve orders
+          description: Internal server error while retrieving orders
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get all approved or rejected orders for the current doctor
+      summary: Get approved or rejected orders for the current doctor
       tags:
       - orders
   /api/order/v1/orders/latest:
     get:
       consumes:
       - application/json
-      description: Retrieve the most recent order for the authenticated patient
+      description: Retrieves the most recent order for the authenticated patient.
+        Returns the latest order regardless of its status.
       produces:
       - application/json
       responses:
@@ -918,30 +936,31 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetOrderByIDResponseDto'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "404":
-          description: No orders found
+          description: No orders found for this patient
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to retrieve order
+          description: Internal server error while retrieving order
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get latest order for the current patient
+      summary: Get the latest order for the current patient
       tags:
       - orders
   /api/order/v1/orders/latest/{patient_id}:
     get:
       consumes:
       - application/json
-      description: Retrieve the most recent order for a specific patient. Only the
-        assigned doctor can access this endpoint.
+      description: Retrieves the most recent order for a specified patient. Only the
+        assigned doctor can access this endpoint. The doctor is verified through the
+        JWT token.
       parameters:
-      - description: Patient ID
+      - description: Patient ID (UUID)
         in: path
         name: patient_id
         required: true
@@ -954,11 +973,12 @@ paths:
           schema:
             $ref: '#/definitions/dto.GetOrderByIDResponseDto'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "403":
-          description: Forbidden - doctor can only access their own patient's orders
+          description: Forbidden - doctors can only access orders for their assigned
+            patients
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "404":
@@ -966,24 +986,24 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to retrieve order
+          description: Internal server error while retrieving order
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Get latest order for a specific patient (doctor only)
+      summary: Get the latest order for a specific patient
       tags:
       - orders
   /api/order/v1/orders/reject:
     post:
       consumes:
       - application/json
-      description: Reject an existing order (doctor only - can only reject their own
-        orders). Sets order status to rejected.
+      description: Rejects an order and sets its status to rejected (doctor only).
+        Only the doctor who created the order can reject it.
       parameters:
-      - description: Order ID to reject
+      - description: Reject order request data
         in: body
-        name: order
+        name: request
         required: true
         schema:
           $ref: '#/definitions/dto.RejectOrderRequestDto'
@@ -995,15 +1015,16 @@ paths:
           schema:
             $ref: '#/definitions/dto.RejectOrderResponseDto'
         "400":
-          description: Invalid request body or order ID
+          description: Invalid request body or missing order ID
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "401":
-          description: Unauthorized
+          description: Unauthorized - authentication token missing or invalid
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "403":
-          description: Forbidden - only doctors can reject their own orders
+          description: Forbidden - only the doctor who created this order can reject
+            it
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "404":
@@ -1011,12 +1032,12 @@ paths:
           schema:
             $ref: '#/definitions/response.ErrorResponse'
         "500":
-          description: Failed to reject order
+          description: Internal server error while rejecting order
           schema:
             $ref: '#/definitions/response.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Reject an order
+      summary: Reject an existing order
       tags:
       - orders
 schemes:

@@ -22,7 +22,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve all delivery information records",
+                "description": "Retrieves all delivery information records from the system.",
                 "consumes": [
                     "application/json"
                 ],
@@ -32,7 +32,7 @@ const docTemplate = `{
                 "tags": [
                     "delivery-info"
                 ],
-                "summary": "Get all delivery information",
+                "summary": "Get all delivery information records",
                 "responses": {
                     "200": {
                         "description": "Delivery information retrieved successfully",
@@ -41,13 +41,13 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Failed to retrieve delivery information",
+                        "description": "Internal server error while retrieving delivery information",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -60,7 +60,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Update an existing delivery information record",
+                "description": "Updates an existing delivery information record with new data.",
                 "consumes": [
                     "application/json"
                 ],
@@ -73,8 +73,8 @@ const docTemplate = `{
                 "summary": "Update delivery information",
                 "parameters": [
                     {
-                        "description": "Updated Delivery Information Data",
-                        "name": "delivery_info",
+                        "description": "Updated delivery information request data",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -90,13 +90,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid request body or delivery information ID",
+                        "description": "Invalid request body or missing delivery information ID",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -108,7 +108,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to update delivery information",
+                        "description": "Internal server error while updating delivery information",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -121,7 +121,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Create a new delivery information record",
+                "description": "Creates a new delivery information record for an order. Contains details about the delivery method and address.",
                 "consumes": [
                     "application/json"
                 ],
@@ -131,11 +131,11 @@ const docTemplate = `{
                 "tags": [
                     "delivery-info"
                 ],
-                "summary": "Create a new delivery information",
+                "summary": "Create new delivery information",
                 "parameters": [
                     {
-                        "description": "Delivery Information Data",
-                        "name": "delivery_info",
+                        "description": "Delivery information request data",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -151,19 +151,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid request body",
+                        "description": "Invalid request body or missing required fields",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Failed to create delivery information",
+                        "description": "Internal server error while creating delivery information",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -176,7 +176,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Delete an existing delivery information record",
+                "description": "Deletes an existing delivery information record.",
                 "consumes": [
                     "application/json"
                 ],
@@ -189,8 +189,8 @@ const docTemplate = `{
                 "summary": "Delete delivery information",
                 "parameters": [
                     {
-                        "description": "Delivery Information ID to delete",
-                        "name": "delivery_info",
+                        "description": "Delivery information ID to delete",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -206,13 +206,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid delivery information ID",
+                        "description": "Invalid or missing delivery information ID",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -224,7 +224,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to delete delivery information",
+                        "description": "Internal server error while deleting delivery information",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -239,7 +239,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve delivery information records filtered by delivery method",
+                "description": "Retrieves all delivery information records filtered by the specified delivery method (e.g., 'flash' for express delivery or 'pick_up' for customer pickup).",
                 "consumes": [
                     "application/json"
                 ],
@@ -249,11 +249,11 @@ const docTemplate = `{
                 "tags": [
                     "delivery-info"
                 ],
-                "summary": "Get delivery information by method",
+                "summary": "Get delivery information by delivery method",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Delivery method (flash or pick_up)",
+                        "description": "Delivery method filter: 'flash' (express delivery) or 'pick_up' (customer pickup)",
                         "name": "method",
                         "in": "query",
                         "required": true
@@ -267,19 +267,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid request",
+                        "description": "Missing or invalid delivery method query parameter",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Failed to retrieve delivery information",
+                        "description": "Internal server error while retrieving delivery information",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -294,7 +294,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve delivery information details by ID",
+                "description": "Retrieves detailed information about a specific delivery record identified by its ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -308,7 +308,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Delivery Information ID",
+                        "description": "Delivery Information ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -322,13 +322,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid delivery information ID",
+                        "description": "Invalid or missing delivery information ID",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -340,7 +340,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to retrieve delivery information",
+                        "description": "Internal server error while retrieving delivery information",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -350,7 +350,7 @@ const docTemplate = `{
         },
         "/api/medicine/v1/medicines": {
             "get": {
-                "description": "Retrieve all available medicines from the system",
+                "description": "Retrieves a list of all available medicines in the system. This endpoint does not require authentication.",
                 "consumes": [
                     "application/json"
                 ],
@@ -360,7 +360,7 @@ const docTemplate = `{
                 "tags": [
                     "medicines"
                 ],
-                "summary": "Get all medicines",
+                "summary": "Get all available medicines",
                 "responses": {
                     "200": {
                         "description": "Medicines retrieved successfully",
@@ -369,7 +369,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to retrieve medicines",
+                        "description": "Internal server error while retrieving medicines",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -379,7 +379,7 @@ const docTemplate = `{
         },
         "/api/medicine/v1/medicines/{id}": {
             "get": {
-                "description": "Retrieve medicine details by ID",
+                "description": "Retrieves detailed information about a specific medicine identified by its ID. This endpoint does not require authentication.",
                 "consumes": [
                     "application/json"
                 ],
@@ -389,11 +389,11 @@ const docTemplate = `{
                 "tags": [
                     "medicines"
                 ],
-                "summary": "Get medicine by ID",
+                "summary": "Get medicine details by ID",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Medicine ID",
+                        "description": "Medicine ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -407,7 +407,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid medicine ID",
+                        "description": "Invalid or missing medicine ID",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -419,7 +419,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to retrieve medicine",
+                        "description": "Internal server error while retrieving medicine",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -434,7 +434,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve all orders for the authenticated patient from JWT token",
+                "description": "Retrieves the complete order history for the authenticated patient. The patient is identified from the JWT authentication token.",
                 "consumes": [
                     "application/json"
                 ],
@@ -444,7 +444,7 @@ const docTemplate = `{
                 "tags": [
                     "orders"
                 ],
-                "summary": "Get all orders history for the current patient",
+                "summary": "Get all orders for the current patient",
                 "responses": {
                     "200": {
                         "description": "Orders retrieved successfully",
@@ -453,13 +453,13 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Failed to retrieve orders",
+                        "description": "Internal server error while retrieving orders",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -472,7 +472,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Update an order (doctor only - can only edit their own orders). Can add, edit, or remove order items.",
+                "description": "Updates an order with new items or modifications. Only doctors can update orders they created. Supports adding, editing, or removing order items.",
                 "consumes": [
                     "application/json"
                 ],
@@ -485,8 +485,8 @@ const docTemplate = `{
                 "summary": "Update an existing order",
                 "parameters": [
                     {
-                        "description": "Order update data",
-                        "name": "order",
+                        "description": "Order update request data",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -502,19 +502,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid request body or order ID",
+                        "description": "Invalid request body or malformed order ID",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "403": {
-                        "description": "Forbidden - only doctors can update their own orders",
+                        "description": "Forbidden - only the doctor who created this order can update it",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -526,7 +526,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to update order",
+                        "description": "Internal server error while updating order",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -539,7 +539,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Create a new order in the system",
+                "description": "Creates a new order in the system. Only patients can create orders. The order will be assigned to the authenticated patient's doctor.",
                 "consumes": [
                     "application/json"
                 ],
@@ -552,8 +552,8 @@ const docTemplate = `{
                 "summary": "Create a new order",
                 "parameters": [
                     {
-                        "description": "Order creation data",
-                        "name": "order",
+                        "description": "Order creation request data",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -569,13 +569,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid request body",
+                        "description": "Invalid request body or missing required fields",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -587,7 +587,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to create order",
+                        "description": "Internal server error while creating order",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -600,7 +600,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Cancel an existing order (doctor only - can only cancel their own orders)",
+                "description": "Cancels an order (doctor only). Only the doctor who created the order can cancel it. The order status will be changed to cancelled.",
                 "consumes": [
                     "application/json"
                 ],
@@ -610,11 +610,11 @@ const docTemplate = `{
                 "tags": [
                     "orders"
                 ],
-                "summary": "Cancel an order",
+                "summary": "Cancel an existing order",
                 "parameters": [
                     {
-                        "description": "Order ID to cancel",
-                        "name": "order",
+                        "description": "Cancel order request data",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -630,19 +630,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid request body or order ID",
+                        "description": "Invalid request body or missing order ID",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "403": {
-                        "description": "Forbidden - only doctors can cancel their own orders",
+                        "description": "Forbidden - only the doctor who created this order can cancel it",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -654,7 +654,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to cancel order",
+                        "description": "Internal server error while cancelling order",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -669,7 +669,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Approve an existing order (doctor only - can only approve their own orders). Sets order status to approved.",
+                "description": "Approves an order and sets its status to approved (doctor only). Only the doctor who created the order can approve it.",
                 "consumes": [
                     "application/json"
                 ],
@@ -679,11 +679,11 @@ const docTemplate = `{
                 "tags": [
                     "orders"
                 ],
-                "summary": "Approve an order",
+                "summary": "Approve an existing order",
                 "parameters": [
                     {
-                        "description": "Order ID to approve",
-                        "name": "order",
+                        "description": "Approve order request data",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -699,19 +699,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid request body or order ID",
+                        "description": "Invalid request body or missing order ID",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "403": {
-                        "description": "Forbidden - only doctors can approve their own orders",
+                        "description": "Forbidden - only the doctor who created this order can approve it",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -723,7 +723,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to approve order",
+                        "description": "Internal server error while approving order",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -738,7 +738,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve all orders created by the authenticated doctor with patient information",
+                "description": "Retrieves all orders created by the authenticated doctor. Includes patient information for each order. The doctor is identified from the JWT authentication token.",
                 "consumes": [
                     "application/json"
                 ],
@@ -757,7 +757,7 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -769,7 +769,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to retrieve orders",
+                        "description": "Internal server error while retrieving orders",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -784,7 +784,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve all approved or rejected orders created by the authenticated doctor with patient information. Can filter by specific status (approved or rejected)",
+                "description": "Retrieves approved or rejected orders created by the authenticated doctor. Includes patient information for each order. Can filter by status using the optional query parameter. Valid status values are \"approved\" or \"rejected\".",
                 "consumes": [
                     "application/json"
                 ],
@@ -794,11 +794,11 @@ const docTemplate = `{
                 "tags": [
                     "orders"
                 ],
-                "summary": "Get all approved or rejected orders for the current doctor",
+                "summary": "Get approved or rejected orders for the current doctor",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Filter by status: approved or rejected",
+                        "description": "Filter by status: 'approved' or 'rejected'. If omitted, returns all approved and rejected orders.",
                         "name": "status",
                         "in": "query"
                     }
@@ -811,7 +811,7 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -823,7 +823,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to retrieve orders",
+                        "description": "Internal server error while retrieving orders",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -838,7 +838,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve the most recent order for the authenticated patient",
+                "description": "Retrieves the most recent order for the authenticated patient. Returns the latest order regardless of its status.",
                 "consumes": [
                     "application/json"
                 ],
@@ -848,7 +848,7 @@ const docTemplate = `{
                 "tags": [
                     "orders"
                 ],
-                "summary": "Get latest order for the current patient",
+                "summary": "Get the latest order for the current patient",
                 "responses": {
                     "200": {
                         "description": "Order retrieved successfully",
@@ -857,19 +857,19 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "No orders found",
+                        "description": "No orders found for this patient",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Failed to retrieve order",
+                        "description": "Internal server error while retrieving order",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -884,7 +884,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve the most recent order for a specific patient. Only the assigned doctor can access this endpoint.",
+                "description": "Retrieves the most recent order for a specified patient. Only the assigned doctor can access this endpoint. The doctor is verified through the JWT token.",
                 "consumes": [
                     "application/json"
                 ],
@@ -894,11 +894,11 @@ const docTemplate = `{
                 "tags": [
                     "orders"
                 ],
-                "summary": "Get latest order for a specific patient (doctor only)",
+                "summary": "Get the latest order for a specific patient",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Patient ID",
+                        "description": "Patient ID (UUID)",
                         "name": "patient_id",
                         "in": "path",
                         "required": true
@@ -912,13 +912,13 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "403": {
-                        "description": "Forbidden - doctor can only access their own patient's orders",
+                        "description": "Forbidden - doctors can only access orders for their assigned patients",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -930,7 +930,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to retrieve order",
+                        "description": "Internal server error while retrieving order",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -945,7 +945,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Reject an existing order (doctor only - can only reject their own orders). Sets order status to rejected.",
+                "description": "Rejects an order and sets its status to rejected (doctor only). Only the doctor who created the order can reject it.",
                 "consumes": [
                     "application/json"
                 ],
@@ -955,11 +955,11 @@ const docTemplate = `{
                 "tags": [
                     "orders"
                 ],
-                "summary": "Reject an order",
+                "summary": "Reject an existing order",
                 "parameters": [
                     {
-                        "description": "Order ID to reject",
-                        "name": "order",
+                        "description": "Reject order request data",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -975,19 +975,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid request body or order ID",
+                        "description": "Invalid request body or missing order ID",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "403": {
-                        "description": "Forbidden - only doctors can reject their own orders",
+                        "description": "Forbidden - only the doctor who created this order can reject it",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -999,7 +999,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to reject order",
+                        "description": "Internal server error while rejecting order",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -1014,7 +1014,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Retrieve order details including order items and medicine information",
+                "description": "Retrieves detailed information about a specific order including all order items and associated medicine information.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1028,7 +1028,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Order ID",
+                        "description": "Order ID (UUID)",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -1042,13 +1042,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid order ID",
+                        "description": "Invalid or missing order ID",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
+                        "description": "Unauthorized - authentication token missing or invalid",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
@@ -1060,7 +1060,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Failed to retrieve order",
+                        "description": "Internal server error while retrieving order",
                         "schema": {
                             "$ref": "#/definitions/response.ErrorResponse"
                         }
