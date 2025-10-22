@@ -325,7 +325,7 @@ func (s *OrderService) GetLatestOrderByPatientID(ctx context.Context) (*dto.GetO
 		return nil, apperr.New(apperr.CodeInternal, "failed to retrieve order", err)
 	}
 	if order == nil {
-		return nil, apperr.New(apperr.CodeNotFound, "no orders found", nil)
+		return &dto.GetOrderByIDResponseDto{}, nil
 	}
 
 	// Convert order items to response format
