@@ -1,21 +1,23 @@
 # How To Run Project
 
 ## Prerequisites
+
+### 1. Install CLI tools
 Install Swag and Goose CLI tools:
 ```bash
 go install github.com/swaggo/swag/cmd/swag@latest
 go install github.com/pressly/goose/v3/cmd/goose@latest
 ```
 
-First, start the required services using Docker Compose:
+### 2. Create .env file
+Create a `.env` file in the project root directory with the required environment variables
+
+### 3. Start Docker services
+Start the required services using Docker Compose:
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
-Then, run the Go application:
-```bash
-go run main.go
-```
 
 ### Create new migration file
 
@@ -91,11 +93,5 @@ goose version
   2. พงศธร รักงาน prukngan
   3. ภวัต เลิศตระกูลชัย Phawat Loedtrakunchai
   4. ธฤต จันทร์ดี tharitpr
-
-## System architecture
-  Microservice
-
-
-
 
 
